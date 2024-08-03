@@ -1,4 +1,7 @@
 const { Pool } = require("pg");
+const fs = require("fs");
+const path = require("path");
+const PDFDocument = require("pdfkit");
 
 // Configure the PostgreSQL connection pool
 const pool = new Pool({
@@ -52,13 +55,12 @@ const createOrdersQuery = `
   price DECIMAL(10, 2) NOT NULL,
   quantity DECIMAL(10,2) NOT NULL,
   product_id INT NOT NULL,
+  coupon VARCHAR(255),
   user_email VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
   FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE
-);
-
-    `;
+);  `;
 pool.query(createOrdersQuery, (err, results) => {
   if (err) {
     console.error("Error creating table:", err);
@@ -66,6 +68,24 @@ pool.query(createOrdersQuery, (err, results) => {
   }
   // console.log(results);
   console.log("orders  table created successfully.");
+});
+const createCouponQuery = `
+CREATE TABLE IF NOT EXISTS coupons (
+    id SERIAL PRIMARY KEY,
+    coupon_name VARCHAR(255) NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_day DATE GENERATED ALWAYS AS (created_at::date) STORED,
+    value DECIMAL(10, 2) NOT NULL,
+    expire_at TIMESTAMP GENERATED ALWAYS AS (created_at + INTERVAL '48 hours') STORED
+); `;
+pool.query(createCouponQuery, (err, results) => {
+  if (err) {
+    console.error("Error creating table:", err);
+    return;
+  }
+  // console.log(results);
+  console.log("coupon table created successfully.");
 });
 
 async function createUser(name, email, password, phno) {
@@ -250,13 +270,15 @@ async function removeCartItem(email, name) {
   }
 } ////centralised table for the whislist need to be implemented please maintain that very goodlu please
 
-async function placeOrder(product_id, price, quantity, email) {
+async function placeOrder(product_id, price, quantity, email, coupon) {
+  console.log(coupon);
+
   try {
     const query = `
-      INSERT INTO orders (price, quantity, product_id, user_email)
-      VALUES ($1, $2, $3, $4) RETURNING *;
+      INSERT INTO orders (price, quantity, product_id, user_email,coupon)
+      VALUES ($1, $2, $3, $4,$5) RETURNING *;
     `;
-    const values = [price, quantity, product_id, email];
+    const values = [price, quantity, product_id, email, coupon];
     const result = await pool.query(query, values);
     console.log("Order placed successfully:", result.rows);
     return true;
@@ -267,7 +289,7 @@ async function placeOrder(product_id, price, quantity, email) {
 }
 
 // Function to place multiple orders
-async function placeOrderList(data, email) {
+async function placeOrderList(data, email, coupon) {
   console.log("Placing order list:", data);
   for (let product of data) {
     console.log("Processing product:", product);
@@ -275,7 +297,8 @@ async function placeOrderList(data, email) {
       product.id,
       product.price,
       product.quantity,
-      email
+      email,
+      coupon
     );
     if (!handle) {
       console.error("Failed to place order for product:", product);
@@ -356,6 +379,81 @@ async function removeProduct(item) {
   }
 }
 
+async function checkCoupon(couponName) {
+  const query = `
+    SELECT id, coupon_name, type, created_at, created_day, value, expire_at
+    FROM coupons
+    WHERE coupon_name = $1;
+  `;
+
+  try {
+    const res = await pool.query(query, [couponName]);
+    if (res.rows.length > 0) {
+      return { value: true, data: res.rows[0] }; // Return the first matching record
+    } else {
+      return { value: false }; // Return false if no matching record is found
+    }
+  } catch (err) {
+    console.error("Error executing query", err.stack);
+    throw err;
+  }
+}
+
+async function generateUserOrderHistoryPDF(email) {
+  const query = `
+    SELECT o.id, o.price, o.quantity, o.created_at, o.coupon, p.name, p.description, p.image 
+    FROM orders o
+    JOIN products p ON o.product_id = p.id
+    WHERE o.user_email = $1;
+  `;
+
+  try {
+    const result = await pool.query(query, [email]);
+    if (result.rows.length === 0) {
+      throw new Error("No orders found for the user.");
+    }
+
+    const doc = new PDFDocument();
+    const filePath = path.join(__dirname, `${email}_order_history.pdf`);
+
+    doc.pipe(fs.createWriteStream(filePath));
+
+    doc.fontSize(25).text("Invoice", { align: "center" });
+    doc.moveDown();
+
+    doc.fontSize(18).text(`User: ${email}`);
+    doc.moveDown();
+
+    let totalAmount = 0;
+    result.rows.forEach((order, index) => {
+      doc.fontSize(15).text(`Order #${index + 1}`);
+      doc.fontSize(12).text(`Product Name: ${order.name}`);
+      doc.fontSize(12).text(`Description: ${order.description}`);
+      doc.fontSize(12).text(`Price: ₹${order.price}`);
+      doc.fontSize(12).text(`Quantity: ${order.quantity}`);
+      doc.fontSize(12).text(`Coupon: ${order.coupon || "N/A"}`);
+      doc
+        .fontSize(12)
+        .text(`Date: ${new Date(order.created_at).toLocaleString()}`);
+      // if (order.image) {
+      //   doc.image(order.image, { width: 100, height: 100 });
+      // }
+      doc.moveDown();
+
+      totalAmount += parseFloat(order.price) * parseFloat(order.quantity);
+    });
+
+    doc.moveDown();
+    doc.fontSize(18).text(`Total Amount: ₹${totalAmount}`);
+    doc.end();
+
+    return filePath;
+  } catch (error) {
+    console.error("Error generating invoice:", error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   getCart,
   createUser,
@@ -367,4 +465,6 @@ module.exports = {
   placeOrderList,
   OrdersList,
   SinglesOrdersList,
+  checkCoupon,
+  generateUserOrderHistoryPDF,
 };

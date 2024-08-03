@@ -8,7 +8,8 @@ const pool = new Pool({
   },
 });
 
-const query = `select `;
+const query = `ALTER TABLE orders ADD COLUMN coupon VARCHAR(255);
+`;
 
 pool.query(query, (err, results) => {
   if (err) {
@@ -28,3 +29,7 @@ pool.query(query, (err, results) => {
 // ALTER COLUMN quantity TYPE DECIMAL USING quantity::DECIMAL;
 //ALTER TABLE orders ALTER COLUMN quantity TYPE DECIMAL USING quantity::DECIMAL;
 //  ALTER TABLE products ADD COLUMN description VARCHAR(255);
+//drop table coupons;
+//INSERT INTO coupons (coupon_name, type, value) VALUES ('event1', 'rupees', 100);
+//
+//ALTER TABLE orders ADD COLUMN coupon VARCHAR(255);

@@ -11,7 +11,9 @@ const {
   placeOrderList,
   removeProduct,
   OrdersList,
-  SinglesOrdersList
+  SinglesOrdersList,
+  checkCoupon,
+  generateUserOrderHistoryPDF,
 } = require("./db/db_functions");
 const {
   addProduct,
@@ -194,10 +196,10 @@ app.post("/placeOrder", async (req, res) => {
   const { product_id, price, quantity, email } = req.body;
 });
 app.post("/placeOrderList", async (req, res) => {
-  const { data, email } = req.body;
-  console.log(data);
+  const { data, email, coupon } = req.body;
+  console.log(req.body);
   try {
-    let handle = await placeOrderList(data, email);
+    let handle = await placeOrderList(data, email, coupon);
     if (handle) {
       res.status(200).json({ message: "orders are placed", value: true });
     } else {
@@ -235,7 +237,7 @@ app.get("/ordersList", async (req, res) => {
 });
 app.post("/singleordersList", async (req, res) => {
   console.log("entered");
-  const {email}=req.body;
+  const { email } = req.body;
   try {
     const response = await SinglesOrdersList(email);
     if (response) {
@@ -246,6 +248,47 @@ app.post("/singleordersList", async (req, res) => {
     console.log(e.message);
   }
 });
+app.post("/checkCoupon", async (req, res) => {
+  const { coupon } = req.body;
+  try {
+    const response = await checkCoupon(coupon);
+    if (response.value) {
+      res
+        .status(200)
+        .json({ message: "valid coupon", value: true, data: response.data });
+    } else {
+      res.status(500).json({ message: "invalid coupon", value: false });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "problem with connection ", value: false });
+
+    console.log(error.message);
+  }
+});
+
+app.post("/generateInvoice", async (req, res) => {
+  const { email, orderId } = req.body;  // Include orderId in the request body
+  try {
+    const filePath = await generateUserOrderHistoryPDF(email, orderId);
+    if (filePath) {
+      res.download(filePath, `${email}_order_${orderId}_invoice.pdf`, (err) => {
+        if (err) {
+          console.error("Error sending file:", err);
+          res.status(500).send("Internal Server Error");
+        } else {
+          console.log("File sent successfully.");
+        }
+      });
+    } else {
+      res.status(404).json({ message: "No orders found for the user." });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error generating invoice", error: error.message });
+  }
+});
+
+
+
 // Start the server
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);

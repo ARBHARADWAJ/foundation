@@ -36,7 +36,7 @@ async function createTableIfNotExists() {
 
 async function getAllProducts() {
   try {
-  const query = `SELECT * FROM products`;
+    const query = `SELECT * FROM products`;
     const result = await pool.query(query);
 
     // Check if any products were found
@@ -52,8 +52,8 @@ async function getAllProducts() {
           image: product.image.toString("base64"),
         };
       });
-      
-      console.log(products); // Moved this line after defining the 'products' variable
+
+      // console.log(products); // Moved this line after defining the 'products' variable
       return products;
     }
   } catch (error) {
@@ -62,8 +62,7 @@ async function getAllProducts() {
   }
 }
 
-
-async function addProduct(name, price, image,description) {
+async function addProduct(name, price, image, description) {
   try {
     // const client = await pool.connect();
 
@@ -73,7 +72,7 @@ async function addProduct(name, price, image,description) {
       const query =
         "INSERT INTO products (name, price, image,description) VALUES ($1, $2, $3,$4) RETURNING *";
 
-      const result = await pool.query(query, [name, price, image,description]);
+      const result = await pool.query(query, [name, price, image, description]);
 
       console.log("User added successfully:", result.rowCount);
 
