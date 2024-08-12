@@ -14,6 +14,11 @@ const {
   SinglesOrdersList,
   checkCoupon,
   generateUserOrderHistoryPDF,
+  getReferalData,
+  insertIntoReferralTable,
+  updateReferralStatus,
+  getReferralStatusByEmail,
+  getOrdersByReferee,
 } = require("./db/db_functions");
 const {
   addProduct,
@@ -36,11 +41,11 @@ app.get("/", (req, res) => {
 });
 
 app.post("/registers", async (req, res) => {
-  const { name, email, password, phno } = req.body;
+  const { name, email, password, phno,referral } = req.body;
   console.log(req.body);
   try {
-    console.log(name, email, password, phno);
-    await createUser(name, email, password, phno);
+    console.log(name, email, password, phno,referral);
+    await createUser(name, email, password, phno,referral);
 
     res.status(200).json({
       message: "User registered",
@@ -62,14 +67,17 @@ app.post("/login", async (req, res) => {
       if (err) {
         res.status(401).json({ message: "Invalid email or password." });
         console.log(err);
+      } else if (!user) {
+        // Handle case where no user is found
+        res.status(404).json({ message: "No user found with the given email and password." });
       } else {
-        let valid = user;
-        console.log("this is at the inde file please check", valid);
+        // Proceed if user is found
+        console.log("this is at the index file please check", user);
         res.status(200).json({
           message: "Login successful!",
-          data: valid,
+          data: user,
           val1: true,
-          role: valid.role,
+          role: user.role,
         });
       }
     });
@@ -78,6 +86,7 @@ app.post("/login", async (req, res) => {
     console.log(e);
   }
 });
+
 
 app.post("/cart", async (req, res) => {
   const { id, name, price, quantity, email } = req.body;
@@ -267,7 +276,7 @@ app.post("/checkCoupon", async (req, res) => {
 });
 
 app.post("/generateInvoice", async (req, res) => {
-  const { email, orderId } = req.body;  // Include orderId in the request body
+  const { email, orderId } = req.body; // Include orderId in the request body
   try {
     const filePath = await generateUserOrderHistoryPDF(email, orderId);
     if (filePath) {
@@ -283,12 +292,93 @@ app.post("/generateInvoice", async (req, res) => {
       res.status(404).json({ message: "No orders found for the user." });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error generating invoice", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error generating invoice", error: error.message });
   }
 });
 
+app.get("/referalData", async (req, res) => {
+  console.log("referral data");
 
+  try {
+    const response = await getReferalData();
+    console.log(response);
 
+    if (response.length > 0) {
+      res.status(201).json({
+        message: "the referal list is here",
+        value: true,
+        data: response,
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error generating invoice", error: error.message });
+    console.log(error.message);
+  }
+});
+
+app.post("/applyReferral", async (req, res) => {
+  console.log("apply referral");
+  console.log(req.body);
+
+  const { name, email, phno } = req.body;
+  const response = await insertIntoReferralTable(name, email, phno);
+  try {
+    if (response) {
+      res.status(201).json({
+        message: "the referal list not found",
+        value: true,
+      });
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+app.post("/processStatus", async (req, res) => {
+  console.log("processStatus");
+  try {
+    const { email, newStatus } = req.body;
+    console.log("referal update");
+
+    console.log(email, " --", newStatus);
+
+    const response = await updateReferralStatus(email, newStatus);
+    res.status(201).json({ value: true, status: "updated" });
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+// getReferralStatusByEmail,
+// getOrdersByReferee
+
+// getReferrals
+app.post("/getReferrals", async (req, res) => {
+  console.log("get the rederals rable");
+  const { name } = req.body;
+  try {
+    // const response=await getOrdersByReferee();
+  } catch (error) {
+    console.log(error.message);
+  }
+});
+
+// getReferalStatus
+app.post("/getReferalStatus", async (req, res) => {
+  console.log("entered referral status");
+
+  const { email } = req.body;
+  try {
+    const response = await getReferralStatusByEmail(email);
+    res.status(201).json({ value: true, refer: response });
+  } catch (error) {
+    console.log(error.message);
+  }
+});
 // Start the server
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);

@@ -12,20 +12,6 @@ const pool = new Pool({
   },
 });
 
-// Create the 'users' table if it does not exist
-// Create the 'users' table if it does not exist
-
-// Drop the 'users' table if it exists
-// const dropTableQuery = "DROP TABLE IF EXISTS users;";
-
-// pool.query(dropTableQuery, (err, results) => {
-//   if (err) {
-//     console.error("Error dropping table:", err);
-//     return;
-//   }
-//   console.log("Users table dropped successfully.");
-// });
-// Create the 'users' table
 
 const createTableQuery = `
   CREATE TABLE IF NOT EXISTS users (
@@ -38,9 +24,11 @@ const createTableQuery = `
     status BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     whtlst JSON,
-    role VARCHAR(255) NOT NULL
-    );
-    `;
+    role VARCHAR(255) NOT NULL,
+    referral VARCHAR(255)
+  );
+`;
+
 pool.query(createTableQuery, (err, results) => {
   if (err) {
     console.error("Error creating table:", err);
@@ -49,6 +37,7 @@ pool.query(createTableQuery, (err, results) => {
   // console.log(results);
   console.log("Users table created successfully.");
 });
+
 const createOrdersQuery = `
   CREATE TABLE IF NOT EXISTS orders (
   id SERIAL PRIMARY KEY,
@@ -88,13 +77,34 @@ pool.query(createCouponQuery, (err, results) => {
   console.log("coupon table created successfully.");
 });
 
-async function createUser(name, email, password, phno) {
+const createReferalQuery = `
+  CREATE TABLE IF NOT EXISTS referral (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phno VARCHAR(15),
+    status VARCHAR(15),
+    link  varchar(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    `;
+// role VARCHAR(255) NOT NULL
+pool.query(createReferalQuery, (err, results) => {
+  if (err) {
+    console.error("Error creating table:", err);
+    return;
+  }
+  // console.log(results);
+  console.log("Referral table created successfully.");
+});
+
+async function createUser(name, email, password, phno,referral) {
   const orders = [{}];
   const whtlst = [{}];
   try {
     const query = `
-      INSERT INTO users (name, email, password, orders, whtlst,role,phno)
-      VALUES ($1, $2, $3, $4, $5,$6,$7) RETURNING id;
+      INSERT INTO users (name, email, password, orders, whtlst,role,phno,referral)
+      VALUES ($1, $2, $3, $4, $5,$6,$7,$8) RETURNING id;
     `;
     const values = [
       name,
@@ -104,6 +114,7 @@ async function createUser(name, email, password, phno) {
       JSON.stringify(whtlst),
       "user",
       phno + "",
+      referral
     ];
     const result = await pool.query(query, values);
     console.log("User added successfully:", result.rows[0].id);
@@ -111,19 +122,6 @@ async function createUser(name, email, password, phno) {
     console.error("Error inserting user:", err);
   }
 }
-// async function createUsers(name, email, phno, selectedOptions) {
-//   try {
-//     const query = `
-//       INSERT INTO eventusers (name, email, phno, selected_options)
-//       VALUES ($1, $2, $3, $4) RETURNING id;
-//     `;
-//     const values = [name, email, phno, JSON.stringify(selectedOptions)];
-//     const result = await pool.query(query, values);
-//     console.log("User added successfully:", result.rows[0].id);
-//   } catch (err) {
-//     console.error("Error inserting user:", err);
-//   }
-// }
 
 async function getUser(email, password, callback) {
   const query = `
@@ -454,6 +452,102 @@ async function generateUserOrderHistoryPDF(email) {
   }
 }
 
+async function getReferalData() {
+  try {
+    const query = "select * from referral";
+    const response = await pool.query(query);
+    
+    if (response.rows.length === 0) {
+      console.log("no referals are there");
+      return [];
+    } else {
+      console.log("the referrals table is here");
+      return response.rows;
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+async function insertIntoReferralTable(name, email, phno) {
+  const status="waiting";
+  const link = `https://farm2kitchen.co.in/?referral=${encodeURIComponent(name)}`;
+//https://farm2kitchen.co.in/
+  const insertReferalQuery = `
+    INSERT INTO referral (name, email, phno, status,link )
+    VALUES ($1, $2, $3, $4,$5)
+    RETURNING *;
+  `;
+  //link need to be added later by once asking
+
+  pool.query(insertReferalQuery, [name, email, phno, status,link], (err, result) => {
+    if (err) {
+      console.error("Error inserting data:", err);
+      return;
+    }
+    console.log("Data inserted successfully:", result.rows[0]);
+  });
+}
+
+async function updateReferralStatus(email, newStatus) {
+  
+  const updateStatusQuery = `
+    UPDATE referral
+    SET status = $1
+    WHERE email = $2;
+  `;
+
+  pool.query(updateStatusQuery, [newStatus, email], (err, result) => {
+    if (err) {
+      console.error("Error updating status:", err);
+      return;
+    }
+    console.log("Status updated successfully:", result.rows[0]);
+  });
+}
+
+async function getReferralStatusByEmail(email) {
+  const getStatusQuery = `
+    SELECT status
+    FROM referral
+    WHERE email = $1;
+  `;
+
+  try {
+    const result = await pool.query(getStatusQuery, [email]);
+    if (result.rows.length > 0) {
+      return result.rows[0].status;
+    } else {
+      console.log("No referral found with the provided email.");
+      return null;
+    }
+  } catch (err) {
+    console.error("Error retrieving status:", err);
+    return null;
+  }
+}
+
+async function getOrdersByReferee(name) {
+  const getOrdersQuery = `
+    SELECT *
+    FROM orders
+    WHERE referee = $1;
+  `;
+
+  try {
+    const result = await pool.query(getOrdersQuery, [name]);
+    if (result.rows.length > 0) {
+      return result.rows;
+    } else {
+      console.log("No orders found for the provided referee.");
+      return [];
+    }
+  } catch (err) {
+    console.error("Error retrieving orders:", err);
+    return [];
+  }
+}
+
+
 module.exports = {
   getCart,
   createUser,
@@ -467,4 +561,10 @@ module.exports = {
   SinglesOrdersList,
   checkCoupon,
   generateUserOrderHistoryPDF,
+  getReferalData,
+  insertIntoReferralTable,
+  updateReferralStatus,
+  getReferralStatusByEmail,
+  getOrdersByReferee  
+
 };

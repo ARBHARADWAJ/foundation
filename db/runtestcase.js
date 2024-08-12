@@ -8,8 +8,8 @@ const pool = new Pool({
   },
 });
 
-const query = `ALTER TABLE orders ADD COLUMN coupon VARCHAR(255);
-`;
+const query = `
+  delete from referral where name='baba';`;
 
 pool.query(query, (err, results) => {
   if (err) {
@@ -17,10 +17,9 @@ pool.query(query, (err, results) => {
     return;
   }
   console.log(results.rows);
-//   console.log(result);
+  //   console.log(result);
   console.log("query successfully.");
 });
-
 
 //the cmdswhich executed
 //ALTER TABLE users ADD COLUMN role VARCHAR(255);
@@ -33,3 +32,5 @@ pool.query(query, (err, results) => {
 //INSERT INTO coupons (coupon_name, type, value) VALUES ('event1', 'rupees', 100);
 //
 //ALTER TABLE orders ADD COLUMN coupon VARCHAR(255);
+//ALTER TABLE users
+// ADD COLUMN IF NOT EXISTS referral VARCHAR(255);
