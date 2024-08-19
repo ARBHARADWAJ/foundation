@@ -19,21 +19,19 @@ const pool = new Pool({
   port: 5432, // Default PostgreSQL port
 });
 
-
-
 const createTableQuery = `
   CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    orders JSON,
     phno VARCHAR(15),
     status BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     whtlst JSON,
     role VARCHAR(255) NOT NULL,
-    referral VARCHAR(255)
+    referral VARCHAR(255),
+    address VARCHAR(255)
   );
 `;
 
@@ -106,23 +104,23 @@ pool.query(createReferalQuery, (err, results) => {
   console.log("Referral table created successfully.");
 });
 
-async function createUser(name, email, password, phno,referral) {
+async function createUser(name, email, password, phno, referral,address) {
   const orders = [{}];
   const whtlst = [{}];
   try {
     const query = `
-      INSERT INTO users (name, email, password, orders, whtlst,role,phno,referral)
+      INSERT INTO users (name, email, password, whtlst,role,phno,referral,address)
       VALUES ($1, $2, $3, $4, $5,$6,$7,$8) RETURNING id;
     `;
     const values = [
       name,
       email,
       password,
-      JSON.stringify(orders),
       JSON.stringify(whtlst),
       "user",
       phno + "",
-      referral
+      referral,
+      address
     ];
     const result = await pool.query(query, values);
     console.log("User added successfully:", result.rows[0].id);
@@ -464,7 +462,7 @@ async function getReferalData() {
   try {
     const query = "select * from referral";
     const response = await pool.query(query);
-    
+
     if (response.rows.length === 0) {
       console.log("no referals are there");
       return [];
@@ -477,9 +475,11 @@ async function getReferalData() {
   }
 }
 async function insertIntoReferralTable(name, email, phno) {
-  const status="waiting";
-  const link = `https://farm2kitchen.co.in/?referral=${encodeURIComponent(name)}`;
-//https://farm2kitchen.co.in/
+  const status = "waiting";
+  const link = `https://farm2kitchen.co.in/?referral=${encodeURIComponent(
+    name
+  )}`;
+  //https://farm2kitchen.co.in/
   const insertReferalQuery = `
     INSERT INTO referral (name, email, phno, status,link )
     VALUES ($1, $2, $3, $4,$5)
@@ -487,17 +487,20 @@ async function insertIntoReferralTable(name, email, phno) {
   `;
   //link need to be added later by once asking
 
-  pool.query(insertReferalQuery, [name, email, phno, status,link], (err, result) => {
-    if (err) {
-      console.error("Error inserting data:", err);
-      return;
+  pool.query(
+    insertReferalQuery,
+    [name, email, phno, status, link],
+    (err, result) => {
+      if (err) {
+        console.error("Error inserting data:", err);
+        return;
+      }
+      console.log("Data inserted successfully:", result.rows[0]);
     }
-    console.log("Data inserted successfully:", result.rows[0]);
-  });
+  );
 }
 
 async function updateReferralStatus(email, newStatus) {
-  
   const updateStatusQuery = `
     UPDATE referral
     SET status = $1
@@ -555,7 +558,6 @@ async function getOrdersByReferee(name) {
   }
 }
 
-
 module.exports = {
   getCart,
   createUser,
@@ -573,6 +575,5 @@ module.exports = {
   insertIntoReferralTable,
   updateReferralStatus,
   getReferralStatusByEmail,
-  getOrdersByReferee  
-
+  getOrdersByReferee,
 };

@@ -41,11 +41,11 @@ app.get("/", (req, res) => {
 });
 
 app.post("/registers", async (req, res) => {
-  const { name, email, password, phno,referral } = req.body;
+  const { name, email, password, phno,referral,address } = req.body;
   console.log(req.body);
   try {
-    console.log(name, email, password, phno,referral);
-    await createUser(name, email, password, phno,referral);
+    console.log(name, email, password, phno,referral,address);
+    await createUser(name, email, password, phno,referral,address);
 
     res.status(200).json({
       message: "User registered",

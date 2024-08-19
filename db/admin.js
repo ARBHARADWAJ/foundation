@@ -79,9 +79,9 @@ async function addProduct(name, price, image, description,category) {
       await createTableIfNotExists();
 
       const query =
-        "INSERT INTO products (name, price, image,description) VALUES ($1, $2, $3,$4) RETURNING *";
+        "INSERT INTO products (name, price, image,description,category) VALUES ($1, $2, $3,$4,$5) RETURNING *";
 
-      const result = await pool.query(query, [name, price, image, description]);
+      const result = await pool.query(query, [name, price, image, description,category]);
 
       console.log("User added successfully:", result.rowCount);
 
