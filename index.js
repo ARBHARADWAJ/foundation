@@ -122,10 +122,10 @@ app.post("/cartlist", async (req, res) => {
 });
 
 app.post("/addorder", upload.single("image"), async (req, res) => {
-  const { name, price, description } = req.body;
+  const { name, price, description,category } = req.body;
   const image = req.file.buffer;
   try {
-    const response = await addProduct(name, price, image, description);
+    const response = await addProduct(name, price, image, description,category);
     console.log(response);
     if (response.rows.length > 0) {
       res.status(201).json({

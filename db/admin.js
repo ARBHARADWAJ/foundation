@@ -1,13 +1,21 @@
 const { Pool } = require("pg");
 
 // Configure the PostgreSQL connection pool
+// const pool = new Pool({
+//   connectionString:
+//     "postgresql://ecommers_sp9k_user:3JLXnxTTjU9WC5w1rBM9yeEeDo8E2YLi@dpg-cqckdt56l47c73d6lemg-a.oregon-postgres.render.com/ecommers_sp9k",
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// });
 const pool = new Pool({
-  connectionString:
-    "postgresql://ecommers_sp9k_user:3JLXnxTTjU9WC5w1rBM9yeEeDo8E2YLi@dpg-cqckdt56l47c73d6lemg-a.oregon-postgres.render.com/ecommers_sp9k",
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  user: "farm2kitchen",
+  host: "localhost",
+  database: "foundation_bblf",
+  password: "bharadwaj",
+  port: 5432, // Default PostgreSQL port
 });
+
 
 async function createTableIfNotExists() {
   try {
@@ -22,7 +30,8 @@ async function createTableIfNotExists() {
             name VARCHAR(255) NOT NULL,
             price DECIMAL(10, 2) NOT NULL,
             image BYTEA NOT NULL,
-            description VARCHAR(255) 
+            description VARCHAR(255) ,
+            category VARCHAR(255)
             );
           `);
       console.log("Table 'products' created successfully.");
@@ -62,7 +71,7 @@ async function getAllProducts() {
   }
 }
 
-async function addProduct(name, price, image, description) {
+async function addProduct(name, price, image, description,category) {
   try {
     // const client = await pool.connect();
 

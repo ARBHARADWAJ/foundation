@@ -4,13 +4,21 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 
 // Configure the PostgreSQL connection pool
+// const pool = new Pool({
+//   connectionString:
+//     "postgresql://ecommers_sp9k_user:3JLXnxTTjU9WC5w1rBM9yeEeDo8E2YLi@dpg-cqckdt56l47c73d6lemg-a.oregon-postgres.render.com/ecommers_sp9k",
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// });
 const pool = new Pool({
-  connectionString:
-    "postgresql://ecommers_sp9k_user:3JLXnxTTjU9WC5w1rBM9yeEeDo8E2YLi@dpg-cqckdt56l47c73d6lemg-a.oregon-postgres.render.com/ecommers_sp9k",
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  user: "farm2kitchen",
+  host: "localhost",
+  database: "foundation_bblf",
+  password: "bharadwaj",
+  port: 5432, // Default PostgreSQL port
 });
+
 
 
 const createTableQuery = `

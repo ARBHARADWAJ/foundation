@@ -1,15 +1,21 @@
 const { Pool } = require("pg");
 
+// const pool = new Pool({
+//   connectionString:
+//     "postgresql://ecommers_sp9k_user:3JLXnxTTjU9WC5w1rBM9yeEeDo8E2YLi@dpg-cqckdt56l47c73d6lemg-a.oregon-postgres.render.com/ecommers_sp9k",
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// });
 const pool = new Pool({
-  connectionString:
-    "postgresql://ecommers_sp9k_user:3JLXnxTTjU9WC5w1rBM9yeEeDo8E2YLi@dpg-cqckdt56l47c73d6lemg-a.oregon-postgres.render.com/ecommers_sp9k",
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  user: "farm2kitchen",
+  host: "localhost",
+  database: "foundation_bblf",
+  password: "bharadwaj",
+  port: 5432, // Default PostgreSQL port
 });
 
-const query = `
-  delete from referral where name='baba';`;
+const query = `ALTER TABLE products ADD COLUMN category VARCHAR(255);`;
 
 pool.query(query, (err, results) => {
   if (err) {
@@ -34,3 +40,5 @@ pool.query(query, (err, results) => {
 //ALTER TABLE orders ADD COLUMN coupon VARCHAR(255);
 //ALTER TABLE users
 // ADD COLUMN IF NOT EXISTS referral VARCHAR(255);
+// delete from referral where name='baba';
+//UPDATE users SET role = 'admin' WHERE email = 'shivenagrofarms@gmail.com';
