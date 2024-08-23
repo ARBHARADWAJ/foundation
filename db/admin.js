@@ -95,4 +95,5 @@ async function addProduct(name, price, image, description,category) {
   }
 }
 
+
 module.exports = { addProduct, createTableIfNotExists, getAllProducts };

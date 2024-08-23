@@ -16,9 +16,10 @@ const {
   generateUserOrderHistoryPDF,
   getReferalData,
   insertIntoReferralTable,
-  updateReferralStatus,
-  getReferralStatusByEmail,
+  // updateReferralStatus,
+  // getReferralStatusByEmail,
   getOrdersByReferee,
+  addReseller,
 } = require("./db/db_functions");
 const {
   addProduct,
@@ -41,11 +42,11 @@ app.get("/", (req, res) => {
 });
 
 app.post("/registers", async (req, res) => {
-  const { name, email, password, phno,referral,address } = req.body;
+  const { name, email, password, phno, referral, address } = req.body;
   console.log(req.body);
   try {
-    console.log(name, email, password, phno,referral,address);
-    await createUser(name, email, password, phno,referral,address);
+    console.log(name, email, password, phno, referral, address);
+    await createUser(name, email, password, phno, referral, address);
 
     res.status(200).json({
       message: "User registered",
@@ -69,7 +70,9 @@ app.post("/login", async (req, res) => {
         console.log(err);
       } else if (!user) {
         // Handle case where no user is found
-        res.status(404).json({ message: "No user found with the given email and password." });
+        res.status(404).json({
+          message: "No user found with the given email and password.",
+        });
       } else {
         // Proceed if user is found
         console.log("this is at the index file please check", user);
@@ -86,7 +89,6 @@ app.post("/login", async (req, res) => {
     console.log(e);
   }
 });
-
 
 app.post("/cart", async (req, res) => {
   const { id, name, price, quantity, email } = req.body;
@@ -122,10 +124,16 @@ app.post("/cartlist", async (req, res) => {
 });
 
 app.post("/addorder", upload.single("image"), async (req, res) => {
-  const { name, price, description,category } = req.body;
+  const { name, price, description, category } = req.body;
   const image = req.file.buffer;
   try {
-    const response = await addProduct(name, price, image, description,category);
+    const response = await addProduct(
+      name,
+      price,
+      image,
+      description,
+      category
+    );
     console.log(response);
     if (response.rows.length > 0) {
       res.status(201).json({
@@ -338,20 +346,20 @@ app.post("/applyReferral", async (req, res) => {
   }
 });
 
-app.post("/processStatus", async (req, res) => {
-  console.log("processStatus");
-  try {
-    const { email, newStatus } = req.body;
-    console.log("referal update");
+// app.post("/processStatus", async (req, res) => {
+//   console.log("processStatus");
+//   try {
+//     const { email, newStatus } = req.body;
+//     console.log("referal update");
 
-    console.log(email, " --", newStatus);
+//     console.log(email, " --", newStatus);
 
-    const response = await updateReferralStatus(email, newStatus);
-    res.status(201).json({ value: true, status: "updated" });
-  } catch (e) {
-    console.log(e);
-  }
-});
+//     const response = await updateReferralStatus(email, newStatus);
+//     res.status(201).json({ value: true, status: "updated" });
+//   } catch (e) {
+//     console.log(e);
+//   }
+// });
 
 // getReferralStatusByEmail,
 // getOrdersByReferee
@@ -367,18 +375,37 @@ app.post("/getReferrals", async (req, res) => {
   }
 });
 
-// getReferalStatus
-app.post("/getReferalStatus", async (req, res) => {
-  console.log("entered referral status");
+app.post("/addReseller", async (req, res) => {
+  const { data } = req.body;
 
-  const { email } = req.body;
   try {
-    const response = await getReferralStatusByEmail(email);
-    res.status(201).json({ value: true, refer: response });
-  } catch (error) {
-    console.log(error.message);
+    const { name, email, password, phno, role, address } = data;
+    await addReseller(name, email, password, phno, address, role);
+
+    res.status(200).json({
+      message: "reseller registered",
+      val1: true,
+      data: email,
+      phno: phno,
+    });
+  } catch (e) {
+    res.status(500).json({ message: "An error occurred.", error: e.message });
+    console.log(e);
   }
 });
+
+// getReferalStatus
+// app.post("/getReferalStatus", async (req, res) => {
+//   console.log("entered referral status");
+
+//   const { email } = req.body;
+//   try {
+//     const response = await getReferralStatusByEmail(email);
+//     res.status(201).json({ value: true, refer: response });
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// });
 // Start the server
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);

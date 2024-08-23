@@ -123,7 +123,9 @@ async function createUser(name, email, password, phno, referral,address) {
       address
     ];
     const result = await pool.query(query, values);
+    
     console.log("User added successfully:", result.rows[0].id);
+    
   } catch (err) {
     console.error("Error inserting user:", err);
   }
@@ -500,42 +502,42 @@ async function insertIntoReferralTable(name, email, phno) {
   );
 }
 
-async function updateReferralStatus(email, newStatus) {
-  const updateStatusQuery = `
-    UPDATE referral
-    SET status = $1
-    WHERE email = $2;
-  `;
+// async function updateReferralStatus(email, newStatus) {
+//   const updateStatusQuery = `
+//     UPDATE referral
+//     SET status = $1
+//     WHERE email = $2;
+//   `;
 
-  pool.query(updateStatusQuery, [newStatus, email], (err, result) => {
-    if (err) {
-      console.error("Error updating status:", err);
-      return;
-    }
-    console.log("Status updated successfully:", result.rows[0]);
-  });
-}
+//   pool.query(updateStatusQuery, [newStatus, email], (err, result) => {
+//     if (err) {
+//       console.error("Error updating status:", err);
+//       return;
+//     }
+//     console.log("Status updated successfully:", result.rows[0]);
+//   });
+// }
 
-async function getReferralStatusByEmail(email) {
-  const getStatusQuery = `
-    SELECT status
-    FROM referral
-    WHERE email = $1;
-  `;
+// async function getReferralStatusByEmail(email) {
+//   const getStatusQuery = `
+//     SELECT status
+//     FROM referral
+//     WHERE email = $1;
+//   `;
 
-  try {
-    const result = await pool.query(getStatusQuery, [email]);
-    if (result.rows.length > 0) {
-      return result.rows[0].status;
-    } else {
-      console.log("No referral found with the provided email.");
-      return null;
-    }
-  } catch (err) {
-    console.error("Error retrieving status:", err);
-    return null;
-  }
-}
+//   try {
+//     const result = await pool.query(getStatusQuery, [email]);
+//     if (result.rows.length > 0) {
+//       return result.rows[0].status;
+//     } else {
+//       console.log("No referral found with the provided email.");
+//       return null;
+//     }
+//   } catch (err) {
+//     console.error("Error retrieving status:", err);
+//     return null;
+//   }
+// }
 
 async function getOrdersByReferee(name) {
   const getOrdersQuery = `
@@ -558,6 +560,34 @@ async function getOrdersByReferee(name) {
   }
 }
 
+async function addReseller(name, email, password, phno, address,role) {
+  const whtlst = [{}];
+  try {
+    const query = `
+      INSERT INTO users (name, email, password, whtlst,role,phno,address)
+      VALUES ($1, $2, $3, $4, $5,$6,$7) RETURNING id;
+    `;
+    const values = [
+      name,
+      email,
+      password,
+      JSON.stringify(whtlst),
+      role,
+      phno + "",
+      address
+    ];
+    const result = await pool.query(query, values);
+    console.log("reseller added successfully:", result.rows[0].id);
+    return true;
+    
+  } catch (err) {
+    console.error("Error inserting reseller:", err);
+    return false;
+  }
+}
+
+
+
 module.exports = {
   getCart,
   createUser,
@@ -573,7 +603,8 @@ module.exports = {
   generateUserOrderHistoryPDF,
   getReferalData,
   insertIntoReferralTable,
-  updateReferralStatus,
-  getReferralStatusByEmail,
+  // updateReferralStatus,
+  // getReferralStatusByEmail,
   getOrdersByReferee,
+  addReseller,
 };
