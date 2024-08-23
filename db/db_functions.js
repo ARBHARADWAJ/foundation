@@ -477,7 +477,7 @@ async function getReferalData() {
   }
 }
 async function insertIntoReferralTable(name, email, phno) {
-  const status = "waiting";
+  const status = "accepted";
   const link = `https://farm2kitchen.co.in/?referral=${encodeURIComponent(
     name
   )}`;

@@ -377,10 +377,9 @@ app.post("/getReferrals", async (req, res) => {
 
 app.post("/addReseller", async (req, res) => {
   const { data } = req.body;
-
   try {
-    const { name, email, password, phno, role, address } = data;
-    await addReseller(name, email, password, phno, address, role);
+    const { name, email, phno} = data;
+    await insertIntoReferralTable(name, email, phno );
 
     res.status(200).json({
       message: "reseller registered",
@@ -393,6 +392,7 @@ app.post("/addReseller", async (req, res) => {
     console.log(e);
   }
 });
+
 
 // getReferalStatus
 // app.post("/getReferalStatus", async (req, res) => {
