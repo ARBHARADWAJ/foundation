@@ -104,7 +104,7 @@ pool.query(createReferalQuery, (err, results) => {
   console.log("Referral table created successfully.");
 });
 
-async function createUser(name, email, password, phno, referral,address) {
+async function createUser(name, email, password, phno, referral,address,role) {
   const orders = [{}];
   const whtlst = [{}];
   try {
@@ -117,7 +117,7 @@ async function createUser(name, email, password, phno, referral,address) {
       email,
       password,
       JSON.stringify(whtlst),
-      "user",
+      role,
       phno + "",
       referral,
       address
