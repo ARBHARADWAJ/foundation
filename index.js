@@ -22,12 +22,11 @@ const {
   addReseller,
   getUsersByReferral,
   getOrdersByReferral,
-} = require("./db/db_functions");
-const {
   addProduct,
-  createTableIfNotExists,
   getAllProducts,
-} = require("./db/admin");
+
+} = require("./db/db_functions");
+const {createTableIfNotExists}=require("./db/Tables/Connections_Tables")
 const cors = require("cors");
 const axios = require("axios");
 const multer = require("multer");
@@ -37,7 +36,8 @@ app.use(cors());
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-var productslist = "";
+
+
 // Basic route
 app.get("/", (req, res) => {
   res.send("Jai shree ram");
@@ -381,7 +381,11 @@ app.post("/getReferrals", async (req, res) => {
 app.post("/addReseller", async (req, res) => {
   const { data } = req.body;
   try {
+    // console.log(data);
+    
     const { name, email, phno, password, address, role } = data;
+    
+    
     await createUser(name, email, password, phno, "", address, role);
     await insertIntoReferralTable(name, email, phno);
 
@@ -454,19 +458,6 @@ app.post("/getOrdersByReferral", async (req, res) => {
 });
 
 
-
-// getReferalStatus
-// app.post("/getReferalStatus", async (req, res) => {
-//   console.log("entered referral status");
-
-//   const { email } = req.body;
-//   try {
-//     const response = await getReferralStatusByEmail(email);
-//     res.status(201).json({ value: true, refer: response });
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// });
 
 // Start the server
 app.listen(port, async () => {

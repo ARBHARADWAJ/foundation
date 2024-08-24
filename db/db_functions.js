@@ -2,111 +2,18 @@ const { Pool } = require("pg");
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
+import { pool, createTableIfNotExists } from "./Tables/Connections_Tables";
 
-// Configure the PostgreSQL connection pool
-// const pool = new Pool({
-//   connectionString:
-//     "postgresql://ecommers_sp9k_user:3JLXnxTTjU9WC5w1rBM9yeEeDo8E2YLi@dpg-cqckdt56l47c73d6lemg-a.oregon-postgres.render.com/ecommers_sp9k",
-//   ssl: {
-//     rejectUnauthorized: false,
-//   },
-// });
-const pool = new Pool({
-  user: "farm2kitchen",
-  host: "localhost",
-  database: "foundation_bblf",
-  password: "bharadwaj",
-  port: 5432, // Default PostgreSQL port
-});
-
-const createTableQuery = `
-  CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    phno VARCHAR(15),
-    status BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    whtlst JSON,
-    role VARCHAR(255) NOT NULL,
-    referral VARCHAR(255),
-    address VARCHAR(255)
-  );
-`;
-
-pool.query(createTableQuery, (err, results) => {
-  if (err) {
-    console.error("Error creating table:", err);
-    return;
-  }
-  // console.log(results);
-  console.log("Users table created successfully.");
-});
-
-const createOrdersQuery = `
-  CREATE TABLE IF NOT EXISTS orders (
-  id SERIAL PRIMARY KEY,
-  price DECIMAL(10, 2) NOT NULL,
-  quantity DECIMAL(10,2) NOT NULL,
-  product_id INT NOT NULL,
-  coupon VARCHAR(255),
-  user_email VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE
-);  `;
-pool.query(createOrdersQuery, (err, results) => {
-  if (err) {
-    console.error("Error creating table:", err);
-    return;
-  }
-  // console.log(results);
-  console.log("orders  table created successfully.");
-});
-const createCouponQuery = `
-CREATE TABLE IF NOT EXISTS coupons (
-    id SERIAL PRIMARY KEY,
-    coupon_name VARCHAR(255) NOT NULL,
-    type VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_day DATE GENERATED ALWAYS AS (created_at::date) STORED,
-    value DECIMAL(10, 2) NOT NULL,
-    expire_at TIMESTAMP GENERATED ALWAYS AS (created_at + INTERVAL '48 hours') STORED
-); `;
-pool.query(createCouponQuery, (err, results) => {
-  if (err) {
-    console.error("Error creating table:", err);
-    return;
-  }
-  // console.log(results);
-  console.log("coupon table created successfully.");
-});
-
-const createReferalQuery = `
-  CREATE TABLE IF NOT EXISTS referral (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    phno VARCHAR(15),
-    status VARCHAR(15),
-    link  varchar(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    `;
-// role VARCHAR(255) NOT NULL
-pool.query(createReferalQuery, (err, results) => {
-  if (err) {
-    console.error("Error creating table:", err);
-    return;
-  }
-  // console.log(results);
-  console.log("Referral table created successfully.");
-});
-
-async function createUser(name, email, password, phno, referral,address,role) {
-  const orders = [{}];
-  const whtlst = [{}];
+async function createUser(
+  name,
+  email,
+  password,
+  phno,
+  referral,
+  address,
+  role
+) {
+  const whtlst = [];
   try {
     const query = `
       INSERT INTO users (name, email, password, whtlst,role,phno,referral,address)
@@ -120,12 +27,11 @@ async function createUser(name, email, password, phno, referral,address,role) {
       role,
       phno + "",
       referral,
-      address
+      address,
     ];
     const result = await pool.query(query, values);
-    
+
     console.log("User added successfully:", result.rows[0].id);
-    
   } catch (err) {
     console.error("Error inserting user:", err);
   }
@@ -150,6 +56,64 @@ async function getUser(email, password, callback) {
     callback(err, null);
   }
 }
+
+async function getAllProducts() {
+  try {
+    const query = `SELECT * FROM products`;
+    const result = await pool.query(query);
+
+    // Check if any products were found
+    if (result.rows.length === 0) {
+      console.log("No products found in the 'products' table.");
+      return [];
+    } else {
+      console.log("All products from 'products':");
+
+      const products = result.rows.map((product) => {
+        return {
+          ...product,
+          image: product.image.toString("base64"),
+        };
+      });
+
+      return products;
+    }
+  } catch (error) {
+    console.error("Error retrieving products:", error);
+    return [];
+  }
+}
+
+async function addProduct(name, price, image, description, category) {
+  try {
+    // const client = await pool.connect();
+
+    try {
+      await createTableIfNotExists();
+
+      const query =
+        "INSERT INTO products (name, price, image,description,category) VALUES ($1, $2, $3,$4,$5) RETURNING *";
+
+      const result = await pool.query(query, [
+        name,
+        price,
+        image,
+        description,
+        category,
+      ]);
+
+      console.log("User added successfully:", result.rowCount);
+
+      let re = await getAllProducts();
+      return result;
+    } finally {
+      // client.release();
+    }
+  } catch (error) {
+    console.error("Error inserting user:", error);
+  }
+}
+
 async function getUserByEmail(email) {
   const query = `
   SELECT * FROM users
@@ -277,7 +241,7 @@ async function removeCartItem(email, name) {
 } ////centralised table for the whislist need to be implemented please maintain that very goodlu please
 
 async function placeOrder(product_id, price, quantity, email, coupon) {
-  console.log(coupon);
+  console.log(product_id, price, quantity, email, coupon);
 
   try {
     const query = `
@@ -560,7 +524,7 @@ async function getOrdersByReferee(name) {
   }
 }
 
-async function addReseller(name, email, password, phno, address,role) {
+async function addReseller(name, email, password, phno, address, role) {
   const whtlst = [{}];
   try {
     const query = `
@@ -574,18 +538,16 @@ async function addReseller(name, email, password, phno, address,role) {
       JSON.stringify(whtlst),
       role,
       phno + "",
-      address
+      address,
     ];
     const result = await pool.query(query, values);
     console.log("reseller added successfully:", result.rows[0].id);
     return true;
-    
   } catch (err) {
     console.error("Error inserting reseller:", err);
     return false;
   }
 }
-
 
 async function getUsersByReferral(referralName) {
   try {
@@ -622,7 +584,6 @@ async function getOrdersByReferral(referralName) {
   }
 }
 
-
 module.exports = {
   getCart,
   createUser,
@@ -643,5 +604,7 @@ module.exports = {
   getOrdersByReferee,
   addReseller,
   getUsersByReferral,
-  getOrdersByReferral
+  getOrdersByReferral,
+  addProduct,
+  getAllProducts
 };
