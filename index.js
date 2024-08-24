@@ -20,6 +20,8 @@ const {
   // getReferralStatusByEmail,
   getOrdersByReferee,
   addReseller,
+  getUsersByReferral,
+  getOrdersByReferral
 } = require("./db/db_functions");
 const {
   addProduct,
@@ -394,6 +396,42 @@ app.post("/addReseller", async (req, res) => {
 });
 
 
+app.post("/getUsersByReferral", async (req, res) => {
+  console.log("Fetching users by referral name...");
+  const { referralName } = req.body;
+
+  try {
+    const response = await getUsersByReferral(referralName);
+    if (response.length > 0) {
+      res.status(200).json({ message: "Users found", value: true, data: response });
+    } else {
+      res.status(404).json({ message: "No users found with this referral name", value: false });
+    }
+  } catch (e) {
+    res.status(500).json({ message: "There was a problem retrieving users", value: false });
+    console.error(e.message);
+  }
+});
+app.post("/getOrdersByReferral", async (req, res) => {
+  console.log("Fetching orders by referral name...");
+  const { referralName } = req.body;
+
+  try {
+    const response = await getOrdersByReferral(referralName);
+    if (response.length > 0) {
+      res.status(200).json({ message: "Orders found", value: true, data: response });
+    } else {
+      res.status(404).json({ message: "No orders found with this referral name", value: false });
+    }
+  } catch (e) {
+    res.status(500).json({ message: "There was a problem retrieving orders", value: false });
+    console.error(e.message);
+  }
+});
+
+
+
+
 // getReferalStatus
 // app.post("/getReferalStatus", async (req, res) => {
 //   console.log("entered referral status");
@@ -406,6 +444,12 @@ app.post("/addReseller", async (req, res) => {
 //     console.log(error.message);
 //   }
 // });
+
+
+
+
+
+
 // Start the server
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);

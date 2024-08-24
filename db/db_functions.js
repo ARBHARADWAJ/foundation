@@ -587,6 +587,41 @@ async function addReseller(name, email, password, phno, address,role) {
 }
 
 
+async function getUsersByReferral(referralName) {
+  try {
+    const query = `
+      SELECT id, name, email, phno, status, created_at, whtlst, role, referral, address
+      FROM users
+      WHERE referral = $1;
+    `;
+    const res = await pool.query(query, [referralName]);
+
+    console.log("Retrieved users with referral name:", referralName);
+    return res.rows;
+  } catch (err) {
+    console.error("Error retrieving users by referral:", err.stack);
+    return [];
+  }
+}
+
+async function getOrdersByReferral(referralName) {
+  try {
+    const query = `
+      SELECT o.id, o.price, o.product_id, o.user_email, o.created_at
+      FROM orders o
+      JOIN users u ON o.user_email = u.email
+      WHERE u.referral = $1;
+    `;
+    const res = await pool.query(query, [referralName]);
+
+    console.log("Retrieved orders for referral name:", referralName);
+    return res.rows;
+  } catch (err) {
+    console.error("Error retrieving orders by referral:", err.stack);
+    return [];
+  }
+}
+
 
 module.exports = {
   getCart,
@@ -607,4 +642,6 @@ module.exports = {
   // getReferralStatusByEmail,
   getOrdersByReferee,
   addReseller,
+  getUsersByReferral,
+  getOrdersByReferral
 };
