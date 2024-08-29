@@ -568,7 +568,7 @@ async function getUsersByReferral(referralName) {
 async function getOrdersByReferral(referralName) {
   try {
     const query = `
-      SELECT  o.price,  u.name, o.created_at
+      SELECT  o.price, u.name, o.created_at
       FROM orders o
       JOIN users u ON o.user_email = u.email
       WHERE u.referral = $1;
@@ -580,6 +580,30 @@ async function getOrdersByReferral(referralName) {
     return res.rows;
   } catch (err) {
     console.error("Error retrieving orders by referral:", err.stack);
+    return [];
+  }
+}
+async function getSortedOrdersByReferral(referralName, sortBy) {
+  try {
+    const validColumns = ['name', 'created_at', 'price'];
+    if (!validColumns.includes(sortBy)) {
+      throw new Error("Invalid column name for sorting");
+    }
+
+    const query = `
+      SELECT o.price, u.name, o.created_at
+      FROM orders o
+      JOIN users u ON o.user_email = u.email
+      WHERE u.referral = $1
+      ORDER BY ${sortBy} ASC;
+    `;
+
+    const res = await pool.query(query, [referralName]);
+
+    console.log(`Retrieved sorted orders by ${sortBy} for referral name:`, referralName);
+    return res.rows;
+  } catch (err) {
+    console.error("Error retrieving sorted orders by referral:", err.stack);
     return [];
   }
 }
@@ -606,5 +630,6 @@ module.exports = {
   getUsersByReferral,
   getOrdersByReferral,
   addProduct,
-  getAllProducts
+  getAllProducts,
+  getSortedOrdersByReferral
 };

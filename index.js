@@ -24,6 +24,7 @@ const {
   getOrdersByReferral,
   addProduct,
   getAllProducts,
+  getSortedOrdersByReferral,
 
 } = require("./db/db_functions");
 const {createTableIfNotExists}=require("./db/Tables/Connections_Tables")
@@ -434,7 +435,7 @@ app.post("/getUsersByReferral", async (req, res) => {
 app.post("/getOrdersByReferral", async (req, res) => {
   console.log("Fetching orders by referral name...");
   const { referralName } = req.body;
-
+  
   try {
     const response = await getOrdersByReferral(referralName);
     if (response.length > 0) {
@@ -457,6 +458,17 @@ app.post("/getOrdersByReferral", async (req, res) => {
     console.error(e.message);
   }
 });
+app.post('/getSortedOrdersByReferral', async (req, res) => {
+  const { referralName, sortBy } = req.body;
+
+  try {
+    const sortedOrders = await getSortedOrdersByReferral(referralName, sortBy);
+    res.json({ success: true, data: sortedOrders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 
 
 
