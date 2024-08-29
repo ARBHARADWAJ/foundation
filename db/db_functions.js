@@ -2,8 +2,7 @@ const { Pool } = require("pg");
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
-import { pool, createTableIfNotExists } from "./Tables/Connections_Tables";
-
+const { pool, createTableIfNotExists }=require("./Tables/Connections_Tables")
 async function createUser(
   name,
   email,
@@ -569,7 +568,7 @@ async function getUsersByReferral(referralName) {
 async function getOrdersByReferral(referralName) {
   try {
     const query = `
-      SELECT o.id, o.price, o.product_id, o.user_email, o.created_at
+      SELECT  o.price,  u.name, o.created_at
       FROM orders o
       JOIN users u ON o.user_email = u.email
       WHERE u.referral = $1;
