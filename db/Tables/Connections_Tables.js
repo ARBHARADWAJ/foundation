@@ -32,6 +32,8 @@ pool.query(createTableQuery, (err, results) => {
   console.log("Users table created successfully.");
 });
 
+    //..
+
 const createOrdersQuery = `
     CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
