@@ -572,6 +572,7 @@ async function getOrdersByReferral(referralName) {
       FROM orders o
       JOIN users u ON o.user_email = u.email
       WHERE u.referral = $1;
+      
     `;
     const res = await pool.query(query, [referralName]);
 
