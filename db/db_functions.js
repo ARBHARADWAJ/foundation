@@ -264,7 +264,9 @@ async function placeOrderList(data, email, coupon) {
   console.log("Placing order list:", data);
   // let url="https://eazypayuat.icicibank.com/EazyPG?merchantid=140157&mandatoryfields=12abc3|76|120|x&optionalfields=&returnurl=https://farm2kitchen.co.in/&ReferenceNo=123abc&submerchantid=76&transactionamount=120&paymode=9"
   // let url= 'https://eazypayuat.icicibank.com/EazyPG?merchantid=140157&mandatory fields=123abc|45|10&optional fields=&returnurl=https://farm2kitchen.co.in/dashboard&Reference No=123abc&submerchantid=45&transaction amount=10&paymode=9';
-let url=  getPaymentUrl(100,'788388828');
+  let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
+
+  let url=  getPaymentUrl(100,randomSixDigitNumber);
   console.log(url);
   
   // for (let product of data) {
