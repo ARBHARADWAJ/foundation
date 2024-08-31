@@ -488,7 +488,7 @@ app.post("/payment-response", async (req, res) => {
   // Print all request data
   console.log("Request Data: ", allRequestData);
 
-  res.redirect("http:localhost:5173/successpage");
+  res.redirect("https://farm2kitchen.co.in/successpage");
 });
 
 // Start the server
