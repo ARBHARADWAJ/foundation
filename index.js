@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const port = 3001; // You can change this port to your desired value
 const {
   createUser,
@@ -33,6 +35,9 @@ const multer = require("multer");
 
 app.use(express.json());
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true })); // for form data (application/x-www-form-urlencoded)
+app.use(bodyParser.json()); // for JSON data
+app.use(cookieParser()); // to parse cookies
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -465,15 +470,24 @@ app.post("/getSortedOrdersByReferral", async (req, res) => {
   }
 });
 
-app.post("/payment-response", async (req, res) => {
-  res.json({
-    success: true,
-    message: "Payment response received and processed.",
-  });
-});
+// app.post("/payment-response", async (req, res) => {
+//   res.json({
+//     success: true,
+//     message: "Payment response received and processed.",
+//   });
+// });
 
 app.post("/payment-response", async (req, res) => {
   console.log(req.body);
+  const allRequestData = {
+    ...req.query, // Get parameters from the query string (equivalent to $_GET)
+    ...req.body, // Get data from the request body (equivalent to $_POST)
+    ...req.cookies, // Get data from cookies (equivalent to $_COOKIE)
+  };
+
+  // Print all request data
+  console.log("Request Data: ", allRequestData);
+
   res.redirect("http:localhost:5173/successpage");
 });
 

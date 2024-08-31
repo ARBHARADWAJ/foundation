@@ -2,9 +2,9 @@ const { Pool } = require("pg");
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
-const crypto = require('crypto');
-const { pool, createTableIfNotExists }=require("./Tables/Connections_Tables")
-const {getPaymentUrl}=require("../middleware/payment")
+const crypto = require("crypto");
+const { pool, createTableIfNotExists } = require("./Tables/Connections_Tables");
+const { getPaymentUrl } = require("../middleware/payment");
 async function createUser(
   name,
   email,
@@ -266,9 +266,9 @@ async function placeOrderList(data, email, coupon) {
   // let url= 'https://eazypayuat.icicibank.com/EazyPG?merchantid=140157&mandatory fields=123abc|45|10&optional fields=&returnurl=https://farm2kitchen.co.in/dashboard&Reference No=123abc&submerchantid=45&transaction amount=10&paymode=9';
   let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
 
-  let url=  getPaymentUrl(100,randomSixDigitNumber);
+  let url = getPaymentUrl(1, randomSixDigitNumber);
   console.log(url);
-  
+
   // for (let product of data) {
   //   console.log("Processing product:", product);
   //   let handle = await placeOrder(
@@ -594,7 +594,7 @@ async function getOrdersByReferral(referralName) {
 }
 async function getSortedOrdersByReferral(referralName, sortBy) {
   try {
-    const validColumns = ['name', 'created_at', 'price'];
+    const validColumns = ["name", "created_at", "price"];
     if (!validColumns.includes(sortBy)) {
       throw new Error("Invalid column name for sorting");
     }
@@ -609,7 +609,10 @@ async function getSortedOrdersByReferral(referralName, sortBy) {
 
     const res = await pool.query(query, [referralName]);
 
-    console.log(`Retrieved sorted orders by ${sortBy} for referral name:`, referralName);
+    console.log(
+      `Retrieved sorted orders by ${sortBy} for referral name:`,
+      referralName
+    );
     return res.rows;
   } catch (err) {
     console.error("Error retrieving sorted orders by referral:", err.stack);
@@ -662,5 +665,5 @@ module.exports = {
   getOrdersByReferral,
   addProduct,
   getAllProducts,
-  getSortedOrdersByReferral
+  getSortedOrdersByReferral,
 };

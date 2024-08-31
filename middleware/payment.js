@@ -5,8 +5,8 @@ const merchantId = "140157";
 const encryptionKey = "1400011601505020";
 const subMerchantId = "45";
 const paymode = "9";
+
 const returnUrl = "https://api.farm2kitchen.co.in/payment-response";
-// https://farm2kitchen.co.in/successpage
 const DEFAULT_BASE_URL = "https://eazypayuat.icicibank.com/EazyPG?";
 
 function getPaymentUrl(amount, referenceNo, optionalField = null) {
@@ -34,11 +34,11 @@ function generatePaymentUrl(
     `&mandatory fields=${mandatoryField}` +
     `&optional fields=${optionalField}` +
     `&returnurl=${getReturnUrl()}` +
-    `&Reference No=${referenceNo}` +//
+    `&Reference No=${referenceNo}` + //
     `&submerchantid=${getSubMerchantId()}` +
     `&transaction amount=${amount}` +
     `&paymode=${getPaymode()}`;
-// reference nodemon,trnction,paymnet mode ,date and time,
+  // reference nodemon,trnction,paymnet mode ,date and time,
   console.log(encryptedUrl);
 
   return encryptedUrl;
@@ -95,20 +95,18 @@ console.log(url);
 
 module.exports = { getPaymentUrl };
 
-
-
 // const express = require('express');
 // const bodyParser = require('body-parser');
 // const cookieParser = require('cookie-parser');
- 
+
 // const app = express();
 // const port = 3000;
- 
+
 // // Middleware to parse request body
 // app.use(bodyParser.urlencoded({ extended: true })); // for form data (application/x-www-form-urlencoded)
 // app.use(bodyParser.json()); // for JSON data
 // app.use(cookieParser()); // to parse cookies
- 
+
 // app.post('/your-endpoint', (req, res) => {
 //     // Access all request data similarly to PHP's $_REQUEST
 //     const allRequestData = {
@@ -116,14 +114,14 @@ module.exports = { getPaymentUrl };
 //         ...req.body,   // Get data from the request body (equivalent to $_POST)
 //         ...req.cookies // Get data from cookies (equivalent to $_COOKIE)
 //     };
- 
+
 //     // Print all request data
 //     console.log("Request Data: ", allRequestData);
- 
+
 //     // Send a response back to the client
 //     res.json(allRequestData);
 // });
- 
+
 // app.listen(port, () => {
 // console.log(`Server running at http://localhost:${port}`);
 // });
