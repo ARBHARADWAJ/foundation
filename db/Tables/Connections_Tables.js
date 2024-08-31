@@ -6,7 +6,10 @@ const pool = new Pool({
   database: "foundation_bblf",
   password: "bharadwaj",
   port: 5432, // Default PostgreSQL port
+
 });
+
+
 
 const createTableQuery = `
     CREATE TABLE IF NOT EXISTS users (

@@ -11,6 +11,7 @@ const { Pool } = require("pg");
 
 const pool = new Pool({
   user: "farm2kitchen",
+  
   host: "localhost",
   database: "foundation_bblf",
   password: "bharadwaj",
