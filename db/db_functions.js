@@ -2,7 +2,9 @@ const { Pool } = require("pg");
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
+const crypto = require('crypto');
 const { pool, createTableIfNotExists }=require("./Tables/Connections_Tables")
+const {getPaymentUrl}=require("../middleware/payment")
 async function createUser(
   name,
   email,
@@ -260,26 +262,31 @@ async function placeOrder(product_id, price, quantity, email, coupon) {
 // Function to place multiple orders
 async function placeOrderList(data, email, coupon) {
   console.log("Placing order list:", data);
-  for (let product of data) {
-    console.log("Processing product:", product);
-    let handle = await placeOrder(
-      product.id,
-      product.price,
-      product.quantity,
-      email,
-      coupon
-    );
-    if (!handle) {
-      console.error("Failed to place order for product:", product);
-      return false;
-    }
-  }
-  await updateJsonArray(email, [], (err, res) => {
-    if (err) {
-      console.log(err.message);
-    }
-  });
-  return true;
+  // let url="https://eazypayuat.icicibank.com/EazyPG?merchantid=140157&mandatoryfields=12abc3|76|120|x&optionalfields=&returnurl=https://farm2kitchen.co.in/&ReferenceNo=123abc&submerchantid=76&transactionamount=120&paymode=9"
+  // let url= 'https://eazypayuat.icicibank.com/EazyPG?merchantid=140157&mandatory fields=123abc|45|10&optional fields=&returnurl=https://farm2kitchen.co.in/dashboard&Reference No=123abc&submerchantid=45&transaction amount=10&paymode=9';
+let url=  getPaymentUrl(100,'788388828');
+  console.log(url);
+  
+  // for (let product of data) {
+  //   console.log("Processing product:", product);
+  //   let handle = await placeOrder(
+  //     product.id,
+  //     product.price,
+  //     product.quantity,
+  //     email,
+  //     coupon
+  //   );
+  //   if (!handle) {
+  //     console.error("Failed to place order for product:", product);
+  //     return false;
+  //   }
+  // }
+  // await updateJsonArray(email, [], (err, res) => {
+  //   if (err) {
+  //     console.log(err.message);
+  //   }
+  // });
+  return url;
 }
 
 // Function to retrieve orders
@@ -607,6 +614,28 @@ async function getSortedOrdersByReferral(referralName, sortBy) {
     return [];
   }
 }
+
+// function encryptText(text, key) {
+//   const cipher = crypto.createCipheriv('aes-128-cbc', key, key);
+//   let encrypted = cipher.update(text, 'utf8', 'base64');
+//   encrypted += cipher.final('base64');
+//   return encrypted;
+// }
+
+// function encryptUrl(url, encryptionKey) {
+//   // Ensure the key is 16 bytes for AES-128
+//   const key = crypto.createHash('sha256').update(encryptionKey).digest('base64').substr(0, 16);
+
+//   // Parse the URL and encrypt each parameter separately
+//   const urlObj = new URL(url);
+//   const params = urlObj.searchParams;
+
+//   for (const [param, value] of params.entries()) {
+//     params.set(param, encryptText(value, key));
+//   }
+
+//   return urlObj.toString();
+// }
 
 module.exports = {
   getCart,

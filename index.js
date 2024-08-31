@@ -25,9 +25,8 @@ const {
   addProduct,
   getAllProducts,
   getSortedOrdersByReferral,
-
 } = require("./db/db_functions");
-const {createTableIfNotExists}=require("./db/Tables/Connections_Tables")
+const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
 const axios = require("axios");
 const multer = require("multer");
@@ -38,9 +37,10 @@ app.use(cors());
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-
 // Basic route
 app.get("/", (req, res) => {
+  console.log("jai shree ram");
+
   res.send("Jai shree ram");
 });
 
@@ -216,13 +216,18 @@ app.post("/removeCartItem", async (req, res) => {
 app.post("/placeOrder", async (req, res) => {
   const { product_id, price, quantity, email } = req.body;
 });
+
 app.post("/placeOrderList", async (req, res) => {
   const { data, email, coupon } = req.body;
   console.log(req.body);
   try {
     let handle = await placeOrderList(data, email, coupon);
     if (handle) {
-      res.status(200).json({ message: "orders are placed", value: true });
+      res.status(200).json({
+        message: "orders are placed",
+        value: true,
+        paymentUrl: handle,
+      });
     } else {
       res.status(500).json({ message: "there is some problem", value: false });
     }
@@ -383,10 +388,9 @@ app.post("/addReseller", async (req, res) => {
   const { data } = req.body;
   try {
     // console.log(data);
-    
+
     const { name, email, phno, password, address, role } = data;
-    
-    
+
     await createUser(name, email, password, phno, "", address, role);
     await insertIntoReferralTable(name, email, phno);
 
@@ -402,8 +406,6 @@ app.post("/addReseller", async (req, res) => {
   }
 });
 
-
-
 app.post("/getUsersByReferral", async (req, res) => {
   console.log("Fetching users by referral name...");
   const { referralName } = req.body;
@@ -415,12 +417,10 @@ app.post("/getUsersByReferral", async (req, res) => {
         .status(200)
         .json({ message: "Users found", value: true, data: response });
     } else {
-      res
-        .status(404)
-        .json({
-          message: "No users found with this referral name",
-          value: false,
-        });
+      res.status(404).json({
+        message: "No users found with this referral name",
+        value: false,
+      });
     }
   } catch (e) {
     res
@@ -430,12 +430,10 @@ app.post("/getUsersByReferral", async (req, res) => {
   }
 });
 
-
-
 app.post("/getOrdersByReferral", async (req, res) => {
   console.log("Fetching orders by referral name...");
   const { referralName } = req.body;
-  
+
   try {
     const response = await getOrdersByReferral(referralName);
     if (response.length > 0) {
@@ -444,12 +442,10 @@ app.post("/getOrdersByReferral", async (req, res) => {
         .status(200)
         .json({ message: "Orders found", value: true, data: response });
     } else {
-      res
-        .status(404)
-        .json({
-          message: "No orders found with this referral name",
-          value: false,
-        });
+      res.status(404).json({
+        message: "No orders found with this referral name",
+        value: false,
+      });
     }
   } catch (e) {
     res
@@ -458,7 +454,7 @@ app.post("/getOrdersByReferral", async (req, res) => {
     console.error(e.message);
   }
 });
-app.post('/getSortedOrdersByReferral', async (req, res) => {
+app.post("/getSortedOrdersByReferral", async (req, res) => {
   const { referralName, sortBy } = req.body;
 
   try {
@@ -469,8 +465,17 @@ app.post('/getSortedOrdersByReferral', async (req, res) => {
   }
 });
 
+app.post("/payment-response", async (req, res) => {
+  res.json({
+    success: true,
+    message: "Payment response received and processed.",
+  });
+});
 
-
+app.post("/payment-response", async (req, res) => {
+  console.log(req.body);
+  res.redirect("http:localhost:5173/successpage");
+});
 
 // Start the server
 app.listen(port, async () => {
