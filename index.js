@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const port = 3001; // You can change this port to your desired value
 const {
   createUser,
@@ -27,6 +27,7 @@ const {
   addProduct,
   getAllProducts,
   getSortedOrdersByReferral,
+  modifyOrderPaymentResponse,
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -223,10 +224,10 @@ app.post("/placeOrder", async (req, res) => {
 });
 
 app.post("/placeOrderList", async (req, res) => {
-  const { data, email, coupon } = req.body;
+  const { data, email, coupon, amount } = req.body;
   console.log(req.body);
   try {
-    let handle = await placeOrderList(data, email, coupon);
+    let handle = await placeOrderList(data, email, coupon, amount);
     if (handle) {
       res.status(200).json({
         message: "orders are placed",
@@ -299,6 +300,8 @@ app.post("/checkCoupon", async (req, res) => {
 
 app.post("/generateInvoice", async (req, res) => {
   const { email, orderId } = req.body; // Include orderId in the request body
+  console.log(email," ",orderId);
+  
   try {
     const filePath = await generateUserOrderHistoryPDF(email, orderId);
     if (filePath) {
@@ -487,8 +490,13 @@ app.post("/payment-response", async (req, res) => {
 
   // Print all request data
   console.log("Request Data: ", allRequestData);
-
+  const response=await modifyOrderPaymentResponse(allRequestData);
+if(response){
   res.redirect("https://farm2kitchen.co.in/successpage");
+}
+else{
+  res.status(500).json({ success: false, message: error.message });
+}
 });
 
 // Start the server

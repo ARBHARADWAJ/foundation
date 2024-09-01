@@ -40,7 +40,7 @@ function generatePaymentUrl(
     `&transaction amount=${amount}` +
     `&paymode=${getPaymode()}`;
   // reference nodemon,trnction,paymnet mode ,date and time,
-  console.log(encryptedUrl);
+  // console.log(encryptedUrl);
 
   return encryptedUrl;
 }
@@ -88,8 +88,8 @@ function getEncryptValue(data) {
 }
 
 // Generate a random 6-digit number
-let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
-console.log(randomSixDigitNumber);
+// let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
+// console.log(randomSixDigitNumber);
 
 // const url = getPaymentUrl(10, "8963728");
 // console.log(url);

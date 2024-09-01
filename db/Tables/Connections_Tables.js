@@ -47,7 +47,9 @@ const createOrdersQuery = `
     user_email VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE
+    FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE,
+    reference_no INT,
+    response JSON
   );  `;
 pool.query(createOrdersQuery, (err, results) => {
   if (err) {

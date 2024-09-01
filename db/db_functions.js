@@ -241,15 +241,31 @@ async function removeCartItem(email, name) {
   }
 } ////centralised table for the whislist need to be implemented please maintain that very goodlu please
 
-async function placeOrder(product_id, price, quantity, email, coupon) {
-  console.log(product_id, price, quantity, email, coupon);
+async function placeOrder(
+  product_id,
+  price,
+  quantity,
+  email,
+  coupon,
+  reference_no,
+  response
+) {
+  console.log(product_id, price, quantity, email, coupon, response);
 
   try {
     const query = `
-      INSERT INTO orders (price, quantity, product_id, user_email,coupon)
-      VALUES ($1, $2, $3, $4,$5) RETURNING *;
+      INSERT INTO orders (price, quantity, product_id, user_email,coupon,reference_no,response)
+      VALUES ($1, $2, $3, $4,$5,$6,$7) RETURNING *;
     `;
-    const values = [price, quantity, product_id, email, coupon];
+    const values = [
+      price,
+      quantity,
+      product_id,
+      email,
+      coupon,
+      reference_no,
+      response,
+    ];
     const result = await pool.query(query, values);
     console.log("Order placed successfully:", result.rows);
     return true;
@@ -260,35 +276,57 @@ async function placeOrder(product_id, price, quantity, email, coupon) {
 }
 
 // Function to place multiple orders
-async function placeOrderList(data, email, coupon) {
-  console.log("Placing order list:", data);
-  // let url="https://eazypayuat.icicibank.com/EazyPG?merchantid=140157&mandatoryfields=12abc3|76|120|x&optionalfields=&returnurl=https://farm2kitchen.co.in/&ReferenceNo=123abc&submerchantid=76&transactionamount=120&paymode=9"
-  // let url= 'https://eazypayuat.icicibank.com/EazyPG?merchantid=140157&mandatory fields=123abc|45|10&optional fields=&returnurl=https://farm2kitchen.co.in/dashboard&Reference No=123abc&submerchantid=45&transaction amount=10&paymode=9';
+async function placeOrderList(data, email, coupon, amount) {
   let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
+  console.log("Placing order list:", data);
 
-  let url = getPaymentUrl(1, randomSixDigitNumber);
+  let url = getPaymentUrl(amount, randomSixDigitNumber);
   console.log(url);
 
-  // for (let product of data) {
-  //   console.log("Processing product:", product);
-  //   let handle = await placeOrder(
-  //     product.id,
-  //     product.price,
-  //     product.quantity,
-  //     email,
-  //     coupon
-  //   );
-  //   if (!handle) {
-  //     console.error("Failed to place order for product:", product);
-  //     return false;
-  //   }
-  // }
-  // await updateJsonArray(email, [], (err, res) => {
-  //   if (err) {
-  //     console.log(err.message);
-  //   }
-  // });
+  for (let product of data) {
+    console.log("Processing product:", product);
+    let handle = await placeOrder(
+      product.id,
+      product.price,
+      product.quantity,
+      email,
+      coupon,
+      randomSixDigitNumber,
+      {}
+    );
+    if (!handle) {
+      console.error("Failed to place order for product:", product);
+      return false;
+    }
+  }
+  await updateJsonArray(email, [], (err, res) => {
+    if (err) {
+      console.log(err.message);
+    }
+  });
   return url;
+}
+
+async function modifyOrderPaymentResponse(responsedata) {
+  const ReferenceNo = responsedata.ReferenceNo;
+  try {
+    const query = `
+            UPDATE orders
+            SET response = $2
+            WHERE reference_no = $1;
+        `;
+
+    const result = await client.query(query, [ReferenceNo, responsedata]);
+    console.log("updated the status fo order reference no:", ReferenceNo);
+    if (result) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (e) {
+    console.log(e.message);
+    return false;
+  }
 }
 
 // Function to retrieve orders
@@ -377,19 +415,24 @@ async function checkCoupon(couponName) {
   }
 }
 
-async function generateUserOrderHistoryPDF(email) {
+async function generateUserOrderHistoryPDF(email,orderId) {
   const query = `
     SELECT o.id, o.price, o.quantity, o.created_at, o.coupon, p.name, p.description, p.image 
     FROM orders o
     JOIN products p ON o.product_id = p.id
-    WHERE o.user_email = $1;
+    WHERE o.user_email = $1 and o.id = $2;
   `;
 
   try {
-    const result = await pool.query(query, [email]);
+    const result = await pool.query(query, [email,orderId]);
     if (result.rows.length === 0) {
       throw new Error("No orders found for the user.");
     }
+    console.log(
+      "=========================",
+      result.rows,
+      "========================="
+    );
 
     const doc = new PDFDocument();
     const filePath = path.join(__dirname, `${email}_order_history.pdf`);
@@ -666,4 +709,5 @@ module.exports = {
   addProduct,
   getAllProducts,
   getSortedOrdersByReferral,
+  modifyOrderPaymentResponse,
 };
