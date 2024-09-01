@@ -91,8 +91,8 @@ function getEncryptValue(data) {
 let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
 console.log(randomSixDigitNumber);
 
-const url = getPaymentUrl(10, "8963728");
-console.log(url);
+// const url = getPaymentUrl(10, "8963728");
+// console.log(url);
 
 module.exports = { getPaymentUrl };
 
