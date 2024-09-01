@@ -315,7 +315,7 @@ async function modifyOrderPaymentResponse(responsedata) {
   SET response = $2
   WHERE reference_no = $1;
   `;
-  const result = await client.query(query, [ReferenceNo, responsedata]);
+  const result = await pool.query(query, [ReferenceNo, responsedata]);
   console.log("there is the result of payment",result);
   try {
   
