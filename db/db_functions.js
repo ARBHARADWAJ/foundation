@@ -308,7 +308,7 @@ async function placeOrderList(data, email, coupon, amount) {
 }
 
 async function modifyOrderPaymentResponse(responsedata) {
-  const ReferenceNo = responsedata.ReferenceNo;
+  let ReferenceNo = +responsedata.ReferenceNo;
   console.log("\n--------------------\n",ReferenceNo,"====================\n");
   console.log(responsedata,"\n=====================");
   
