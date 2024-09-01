@@ -291,7 +291,7 @@ async function placeOrderList(data, email, coupon, amount) {
       product.quantity,
       email,
       coupon,
-      randomSixDigitNumber,
+      randomSixDigitNumber+"",
       {}
     );
     if (!handle) {
@@ -308,20 +308,18 @@ async function placeOrderList(data, email, coupon, amount) {
 }
 
 async function modifyOrderPaymentResponse(responsedata) {
-  let ReferenceNo = +responsedata.ReferenceNo;
-  console.log("\n--------------------\n",ReferenceNo,"====================\n");
-  console.log(responsedata,"\n=====================");
-  
-  
+  let ReferenceNo = responsedata.ReferenceNo.trim();
+  console.log(typeof ReferenceNo);
+  const query = `
+  UPDATE orders
+  SET response = $2
+  WHERE reference_no = $1;
+  `;
+  const result = await client.query(query, [ReferenceNo, responsedata]);
+  console.log("there is the result of payment",result);
   try {
-    const query = `
-            UPDATE orders
-            SET response = $2
-            WHERE reference_no = $1;
-        `;
-
-    const result = await client.query(query, [ReferenceNo, responsedata]);
-    console.log("updated the status fo order reference no:", ReferenceNo);
+  
+    // console.log("updated the status fo order reference no:", ReferenceNo);
     if (result) {
       return true;
     } else {

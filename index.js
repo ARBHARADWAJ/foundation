@@ -489,9 +489,9 @@ app.post("/payment-response", async (req, res) => {
   };
 
   // Print all request data
-  console.log("Request Data: ", allRequestData);
+  // console.log("Request Data: ", allRequestData);
   const response=await modifyOrderPaymentResponse(allRequestData);
-console.log(response);
+// console.log(response);
 
   res.redirect("https://farm2kitchen.co.in/successpage");
 
