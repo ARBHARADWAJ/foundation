@@ -491,12 +491,10 @@ app.post("/payment-response", async (req, res) => {
   // Print all request data
   console.log("Request Data: ", allRequestData);
   const response=await modifyOrderPaymentResponse(allRequestData);
-if(response){
+console.log(response);
+
   res.redirect("https://farm2kitchen.co.in/successpage");
-}
-else{
-  res.status(500).json({ success: false, message: error.message });
-}
+
 });
 
 // Start the server
