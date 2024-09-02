@@ -25,7 +25,8 @@ const {
   getUsersByReferral,
   getOrdersByReferral,
   addProduct,
-  getAllProducts,getProductsByCategory,
+  getAllProducts,
+  getProductsByCategory,
   getSortedOrdersByReferral,
   modifyOrderPaymentResponse,
 } = require("./db/db_functions");
@@ -199,8 +200,12 @@ app.post("/getProductsByCategory", async (req, res) => {
     } else {
       console.log("there is no data in the table");
       res
-        .status(500)
-        .json({ message: "record is not stored successful", value: false });
+        .status(200)
+        .json({
+          message: "record is not stored successful",
+          value: true,
+          data: [],
+        });
     }
   } catch (e) {
     console.log(e);
