@@ -25,7 +25,7 @@ const {
   getUsersByReferral,
   getOrdersByReferral,
   addProduct,
-  getAllProducts,
+  getAllProducts,getProductsByCategory,
   getSortedOrdersByReferral,
   modifyOrderPaymentResponse,
 } = require("./db/db_functions");
@@ -186,6 +186,29 @@ app.get("/getAllProducts", async (req, res) => {
       .json({ message: "record is not stored successful", value: false });
   }
 });
+app.post("/getProductsByCategory", async (req, res) => {
+  const { category } = req.body;
+  try {
+    const response = await getProductsByCategory(category);
+    if (response.length > 0) {
+      res.status(201).json({
+        message: "the category: " + category + " data has been retrived",
+        value: true,
+        data: response,
+      });
+    } else {
+      console.log("there is no data in the table");
+      res
+        .status(500)
+        .json({ message: "record is not stored successful", value: false });
+    }
+  } catch (e) {
+    console.log(e);
+    res
+      .status(500)
+      .json({ message: "record is not stored successful", value: false });
+  }
+});
 
 app.post("/getUser", async (req, res) => {
   console.log("get users");
@@ -300,8 +323,8 @@ app.post("/checkCoupon", async (req, res) => {
 
 app.post("/generateInvoice", async (req, res) => {
   const { email, orderId } = req.body; // Include orderId in the request body
-  console.log(email," ",orderId);
-  
+  console.log(email, " ", orderId);
+
   try {
     const filePath = await generateUserOrderHistoryPDF(email, orderId);
     if (filePath) {
@@ -490,11 +513,10 @@ app.post("/payment-response", async (req, res) => {
 
   // Print all request data
   // console.log("Request Data: ", allRequestData);
-  const response=await modifyOrderPaymentResponse(allRequestData);
-// console.log(response);
+  const response = await modifyOrderPaymentResponse(allRequestData);
+  // console.log(response);
 
   res.redirect("https://farm2kitchen.co.in/successpage");
-
 });
 
 // Start the server

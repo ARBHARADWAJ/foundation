@@ -84,6 +84,32 @@ async function getAllProducts() {
     return [];
   }
 }
+async function getProductsByCategory(category) {
+  try {
+    const query = `SELECT * FROM products WHERE category= $1`;
+    const result = await pool.query(query, [category]);
+
+    // Check if any products were found
+    if (result.rows.length === 0) {
+      console.log("No products found in the 'products' table.");
+      return [];
+    } else {
+      console.log("All products from 'products' with the category is here");
+
+      const products = result.rows.map((product) => {
+        return {
+          ...product,
+          image: product.image.toString("base64"),
+        };
+      });
+
+      return products;
+    }
+  } catch (error) {
+    console.error("Error retrieving products:", error);
+    return [];
+  }
+}
 
 async function addProduct(name, price, image, description, category) {
   try {
@@ -291,7 +317,7 @@ async function placeOrderList(data, email, coupon, amount) {
       product.quantity,
       email,
       coupon,
-      randomSixDigitNumber+"",
+      randomSixDigitNumber + "",
       {}
     );
     if (!handle) {
@@ -316,9 +342,8 @@ async function modifyOrderPaymentResponse(responsedata) {
   WHERE reference_no = $1;
   `;
   const result = await pool.query(query, [ReferenceNo, responsedata]);
-  console.log("there is the result of payment",result);
+  console.log("there is the result of payment", result);
   try {
-  
     // console.log("updated the status fo order reference no:", ReferenceNo);
     if (result) {
       return true;
@@ -417,7 +442,7 @@ async function checkCoupon(couponName) {
   }
 }
 
-async function generateUserOrderHistoryPDF(email,orderId) {
+async function generateUserOrderHistoryPDF(email, orderId) {
   const query = `
     SELECT o.id, o.price, o.quantity, o.created_at, o.coupon, p.name, p.description, p.image 
     FROM orders o
@@ -426,7 +451,7 @@ async function generateUserOrderHistoryPDF(email,orderId) {
   `;
 
   try {
-    const result = await pool.query(query, [email,orderId]);
+    const result = await pool.query(query, [email, orderId]);
     if (result.rows.length === 0) {
       throw new Error("No orders found for the user.");
     }
@@ -710,6 +735,7 @@ module.exports = {
   getOrdersByReferral,
   addProduct,
   getAllProducts,
+  getProductsByCategory,
   getSortedOrdersByReferral,
   modifyOrderPaymentResponse,
 };
