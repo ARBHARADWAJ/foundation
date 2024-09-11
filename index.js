@@ -557,6 +557,7 @@ app.post("/addCategories", async (req, res) => {
 });
 
 app.delete("/deleteCategory", async (req, res) => {
+  
   const { name, type } = req.body;
   try {
     const response = await deleteCategory(name, type);

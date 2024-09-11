@@ -696,13 +696,13 @@ async function getCategories() {
   const subcategory = await pool.query(query2);
   const response = {};
   if (category.rows.length === 0) {
-    console.log("no categories");
+    // console.log("no categories");
     response.category = [];
   } else {
     response.category = category.rows;
   }
   if (subcategory.rows.length === 0) {
-    console.log("no subcategories");
+    // console.log("no subcategories");
     response.subcategory = [];
   } else {
     response.subcategory = subcategory.rows;
