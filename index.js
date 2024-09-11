@@ -30,7 +30,8 @@ const {
   getSortedOrdersByReferral,
   modifyOrderPaymentResponse,
   getCategories,
-  addCategory,deleteCategory
+  addCategory,
+  deleteCategory,
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -541,38 +542,34 @@ app.post("/addCategories", async (req, res) => {
   const { category, subcategory } = req.body;
   try {
     const response = await addCategory(category, subcategory);
-      res.status(201).json({
-        message: "category and sub category  is successfully registered",
-        value: true,
-        category: response.category,
-        subcategory: response.subcategory,
-      });
+    res.status(201).json({
+      message: "category and sub category  is successfully registered",
+      value: true,
+      category: response.category,
+      subcategory: response.subcategory,
+    });
   } catch (e) {
     console.log(e.message);
-       res
-        .status(500)
-        .json({ message: "record is not stored successful", value: false });
+    res
+      .status(500)
+      .json({ message: "record is not stored successful", value: false });
   }
 });
 
 app.delete("/deleteCategory", async (req, res) => {
-  const {name,type}=req.body;
+  const { name, type } = req.body;
   try {
-    const response = await deleteCategory(name,type);
-    if (response.length > 0) {
-      res.status(201).json({
-        message: "successfully deleted",
-        value: true,
-        category: response,
-      });
-    } else {
-      console.log("there is no data in the table");
-      res
-        .status(500)
-        .json({ message: "record is not stored successful", value: false });
-    }
+    const response = await deleteCategory(name, type);
+    res.status(201).json({
+      message: "successfully deleted",
+      value: true,
+      category: response,
+    });
   } catch (e) {
     console.log(e.message);
+    res
+      .status(500)
+      .json({ message: "record is not stored successful", value: false });
   }
 });
 // Start the server

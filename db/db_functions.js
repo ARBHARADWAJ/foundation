@@ -728,6 +728,8 @@ async function addCategory(category, subcategory) {
 }
 
 async function deleteCategory(name, type) {
+  console.log(name,type);
+  
   const queryMap = {
     category: "DELETE FROM categories WHERE category = $1",
     subcategory: "DELETE FROM subcategories WHERE subcategory = $1",
