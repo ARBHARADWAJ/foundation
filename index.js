@@ -541,19 +541,12 @@ app.post("/addCategories", async (req, res) => {
   const { category, subcategory } = req.body;
   try {
     const response = await addCategory(category, subcategory);
-    // if (response.category.length>0) {
       res.status(201).json({
         message: "category and sub category  is successfully registered",
         value: true,
         category: response.category,
         subcategory: response.subcategory,
       });
-    // } else {
-    //   console.log("there is no data in the table");
-    //   res
-    //     .status(500)
-    //     .json({ message: "record is not stored successful", value: false });
-    // }
   } catch (e) {
     console.log(e.message);
        res
