@@ -29,6 +29,8 @@ const {
   getProductsByCategory,
   getSortedOrdersByReferral,
   modifyOrderPaymentResponse,
+  getCategories,
+  addCategory,deleteCategory
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -199,13 +201,11 @@ app.post("/getProductsByCategory", async (req, res) => {
       });
     } else {
       console.log("there is no data in the table");
-      res
-        .status(200)
-        .json({
-          message: "record is not stored successful",
-          value: true,
-          data: [],
-        });
+      res.status(200).json({
+        message: "record is not stored successful",
+        value: true,
+        data: [],
+      });
     }
   } catch (e) {
     console.log(e);
@@ -524,6 +524,61 @@ app.post("/payment-response", async (req, res) => {
   res.redirect("https://farm2kitchen.co.in/successpage");
 });
 
+app.get("/categories", async (req, res) => {
+  try {
+    const response = await getCategories();
+    if (!response) {
+      res.status(500).json({ message: "no category found", value: false });
+    }
+    res.status(200).json({ message: "here is the data", category: response });
+  } catch (e) {
+    console.log(e.message);
+    res.status(500).json({ message: "no category found", value: false });
+  }
+});
+
+app.post("/addCategories", async (req, res) => {
+  const { category, subcategory } = req.body;
+  try {
+    const response = await addCategory(category, subcategory);
+    if (response.length > 0) {
+      res.status(201).json({
+        message: "category and sub category  is successfully registered",
+        value: true,
+        category: response.category,
+        subcategory: response.subcategory,
+      });
+    } else {
+      console.log("there is no data in the table");
+      res
+        .status(500)
+        .json({ message: "record is not stored successful", value: false });
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+
+app.delete("/deleteCategory", async (req, res) => {
+  const {name,type}=req.body;
+  try {
+    const response = await deleteCategory(name,type);
+    if (response.length > 0) {
+      res.status(201).json({
+        message: "successfully deleted",
+        value: true,
+        category: response,
+      });
+    } else {
+      console.log("there is no data in the table");
+      res
+        .status(500)
+        .json({ message: "record is not stored successful", value: false });
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+});
 // Start the server
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);

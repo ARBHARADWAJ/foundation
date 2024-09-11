@@ -6,10 +6,7 @@ const pool = new Pool({
   database: "foundation_bblf",
   password: "bharadwaj",
   port: 5432, // Default PostgreSQL port
-
 });
-
-
 
 const createTableQuery = `
     CREATE TABLE IF NOT EXISTS users (
@@ -34,8 +31,38 @@ pool.query(createTableQuery, (err, results) => {
   // console.log(results);
   console.log("Users table created successfully.");
 });
+const createQuery = `
+    CREATE TABLE IF NOT EXISTS categories (
+      id SERIAL PRIMARY KEY,
+      category VARCHAR(255) NOT NULL,
+      status BOOLEAN DEFAULT TRUE
+    );
+  `;
+pool.query(createQuery, (err, results) => {
+  if (err) {
+    console.error("Error creating table:", err);
+    return;
+  }
+  // console.log(results);
+  console.log("category table created successfully.");
+});
+const createsubQuery = `
+    CREATE TABLE IF NOT EXISTS subcategories (
+      id SERIAL PRIMARY KEY,
+      subcategory VARCHAR(255) NOT NULL,
+      status BOOLEAN DEFAULT TRUE
+    );
+  `;
+pool.query(createsubQuery, (err, results) => {
+  if (err) {
+    console.error("Error creating table:", err);
+    return;
+  }
+  // console.log(results);
+  console.log("subcategory table created successfully.");
+});
 
-    //..
+//..
 
 const createOrdersQuery = `
     CREATE TABLE IF NOT EXISTS orders (
@@ -123,6 +150,5 @@ async function createTableIfNotExists() {
     console.error("Error creating table:", error);
   }
 }
-
 
 module.exports = { pool, createTableIfNotExists };

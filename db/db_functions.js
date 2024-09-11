@@ -689,28 +689,63 @@ async function getSortedOrdersByReferral(referralName, sortBy) {
     return [];
   }
 }
+async function getCategories() {
+  const query1 = "select category from categories";
+  const query2 = "select subcategory from subcategories";
+  const category = await pool.query(query1);
+  const subcategory = await pool.query(query2);
+  const response = {};
+  if (category.rows.length === 0) {
+    console.log("no categories");
+    response.category = [];
+  } else {
+    response.category = category.rows;
+  }
+  if (subcategory.rows.length === 0) {
+    console.log("no subcategories");
+    response.subcategory = [];
+  } else {
+    response.subcategory = subcategory.rows;
+  }
+  return response;
+}
 
-// function encryptText(text, key) {
-//   const cipher = crypto.createCipheriv('aes-128-cbc', key, key);
-//   let encrypted = cipher.update(text, 'utf8', 'base64');
-//   encrypted += cipher.final('base64');
-//   return encrypted;
-// }
+async function addCategory(category, subcategory) {
+  const query1 = "insert into category (category) values($1)";
+  const query2 = "insert into subcategory (subcategory) values($1)";
 
-// function encryptUrl(url, encryptionKey) {
-//   // Ensure the key is 16 bytes for AES-128
-//   const key = crypto.createHash('sha256').update(encryptionKey).digest('base64').substr(0, 16);
+  if (category.length > 0) {
+    const category2 = await pool.query(query1, [category]);
+    console.log(category2);
+  } else if (subcategory.length > 0) {
+    const subcategory2 = await pool.query(query2, [subcategory]);
+    console.log(subcategory2);
+  }
 
-//   // Parse the URL and encrypt each parameter separately
-//   const urlObj = new URL(url);
-//   const params = urlObj.searchParams;
+  const response = await getCategories();
 
-//   for (const [param, value] of params.entries()) {
-//     params.set(param, encryptText(value, key));
-//   }
+  return response; // Moved to ensure it returns the response for both category and subcategory
+}
 
-//   return urlObj.toString();
-// }
+async function deleteCategory(name, type) {
+  const queryMap = {
+    category: "DELETE FROM categories WHERE category = $1",
+    subcategory: "DELETE FROM subcategories WHERE subcategory = $1",
+  };
+  const query = queryMap[type]; // Select the correct query based on type
+  if (!query) {
+    console.log("Invalid category type");
+    return;
+  }
+  try {
+    const result = await pool.query(query, [name]);
+    console.log("Deleted", result.rowCount, "row(s) from", type);
+  } catch (e) {
+    console.log(e.message);
+  }
+  const response = await getCategories(); // Fetch updated categories after deletion
+  return response;
+}
 
 module.exports = {
   getCart,
@@ -738,4 +773,7 @@ module.exports = {
   getProductsByCategory,
   getSortedOrdersByReferral,
   modifyOrderPaymentResponse,
+  getCategories,
+  addCategory,
+  deleteCategory,
 };
