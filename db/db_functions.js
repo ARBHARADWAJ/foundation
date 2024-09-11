@@ -711,8 +711,8 @@ async function getCategories() {
 }
 
 async function addCategory(category, subcategory) {
-  const query1 = "insert into category (category) values($1)";
-  const query2 = "insert into subcategory (subcategory) values($1)";
+  const query1 = "insert into categories (category) values($1)";
+  const query2 = "insert into subcategories (subcategory) values($1)";
 
   if (category.length > 0) {
     const category2 = await pool.query(query1, [category]);
