@@ -149,7 +149,7 @@ app.post("/addorder", upload.single("image"), async (req, res) => {
       description,
       category,subcategory
     );
-    console.log(response);
+    // console.log(response);
     if (response.rows.length > 0) {
       res.status(201).json({
         message: "Object is successfully registered",
