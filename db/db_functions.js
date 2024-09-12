@@ -111,7 +111,15 @@ async function getProductsByCategory(category) {
   }
 }
 
-async function addProduct(name, price, image, description, category) {
+async function addProduct(
+  name,
+  price,
+  subprice,
+  image,
+  description,
+  category,
+  subcategory
+) {
   try {
     // const client = await pool.connect();
 
@@ -119,17 +127,19 @@ async function addProduct(name, price, image, description, category) {
       await createTableIfNotExists();
 
       const query =
-        "INSERT INTO products (name, price, image,description,category) VALUES ($1, $2, $3,$4,$5) RETURNING *";
+        "INSERT INTO products (name, price,subprice, image,description,category,subcategory) VALUES ($1, $2, $3,$4,$5,$6,$7) RETURNING *";
 
       const result = await pool.query(query, [
         name,
         price,
+        subprice,
         image,
         description,
         category,
+        subcategory,
       ]);
 
-      console.log("User added successfully:", result.rowCount);
+      console.log("product added successfully:", result.rowCount);
 
       let re = await getAllProducts();
       return result;
@@ -728,8 +738,8 @@ async function addCategory(category, subcategory) {
 }
 
 async function deleteCategory(name, type) {
-  console.log(name,type);
-  
+  console.log(name, type);
+
   const queryMap = {
     category: "DELETE FROM categories WHERE category = $1",
     subcategory: "DELETE FROM subcategories WHERE subcategory = $1",

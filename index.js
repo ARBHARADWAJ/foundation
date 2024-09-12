@@ -138,15 +138,16 @@ app.post("/cartlist", async (req, res) => {
 });
 
 app.post("/addorder", upload.single("image"), async (req, res) => {
-  const { name, price, description, category } = req.body;
+  const { name, price,subprice, description, category,subcategory } = req.body;
   const image = req.file.buffer;
   try {
     const response = await addProduct(
       name,
       price,
+      subprice,
       image,
       description,
-      category
+      category,subcategory
     );
     console.log(response);
     if (response.rows.length > 0) {
@@ -168,6 +169,7 @@ app.post("/addorder", upload.single("image"), async (req, res) => {
       .json({ message: "record is not stored successful", value: false });
   }
 });
+
 app.get("/getAllProducts", async (req, res) => {
   try {
     const response = await getAllProducts();
@@ -190,6 +192,7 @@ app.get("/getAllProducts", async (req, res) => {
       .json({ message: "record is not stored successful", value: false });
   }
 });
+
 app.post("/getProductsByCategory", async (req, res) => {
   const { category } = req.body;
   try {

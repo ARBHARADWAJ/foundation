@@ -139,7 +139,8 @@ async function createTableIfNotExists() {
               price DECIMAL(10, 2) NOT NULL,
               image BYTEA NOT NULL,
               description VARCHAR(255) ,
-              category VARCHAR(255)
+              category VARCHAR(255),
+              subcategory VARCHAR(255),
               );
             `);
       console.log("Table 'products' created successfully.");
