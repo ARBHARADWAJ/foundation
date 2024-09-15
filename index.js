@@ -32,7 +32,9 @@ const {
   getCategories,
   addCategory,
   deleteCategory,
-  updateProduct
+  updateProduct,
+  updateReseller,
+  deleteReseller,
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -580,9 +582,9 @@ app.delete("/deleteCategory", async (req, res) => {
 });
 
 app.post("/updateProduct", async (req, res) => {
-  const { name, description, price, subprice, category, subcategory,name2 } =
+  const { name, description, price, subprice, category, subcategory, name2 } =
     req.body;
-  console.log(name, description, price, subprice, category, subcategory,name2);
+  console.log(name, description, price, subprice, category, subcategory, name2);
 
   try {
     const response = await updateProduct(
@@ -609,6 +611,51 @@ app.post("/updateProduct", async (req, res) => {
     res
       .status(500)
       .json({ message: "record is not updated successful", value: false });
+  }
+});
+app.post("/updateReseller", async (req, res) => {
+  const { name, id } = req.body;
+
+  console.log(name, id);
+
+  try {
+    const response = await updateReseller(name, id);
+    if (response) {
+      res.status(201).json({
+        message: "successfully updated",
+        value: true,
+      });
+    } else {
+      res
+        .status(500)
+        .json({ message: "record is not updated successful", value: false });
+    }
+  } catch (e) {
+    console.log(e.message);
+    res
+      .status(500)
+      .json({ message: "record is not updated successful", value: false });
+  }
+});
+app.post("/deleteReseller", async (req, res) => {
+  const { data } = req.body;
+  try {
+    const response = await deleteReseller(data);
+    if (response) {
+      res.status(201).json({
+        message: "successfully deleted",
+        value: true,
+      });
+    } else {
+      res
+        .status(500)
+        .json({ message: "record is not deleted successful", value: false });
+    }
+  } catch (e) {
+    console.log(e.message);
+    res
+      .status(500)
+      .json({ message: "record is not deleted successful", value: false });
   }
 });
 

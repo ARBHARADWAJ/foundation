@@ -786,6 +786,35 @@ async function updateProduct(
     return false;
   }
 }
+async function updateReseller(name, id) {
+  const link = `https://farm2kitchen.co.in/?referral=${encodeURIComponent(
+    name
+  )}`;
+  const query = "UPDATE referral SET name=$1,link=$2 WHERE id=$3";
+  try {
+    const response = await pool.query(query, [
+      name,
+      link,
+      id, // Use the renamed parameter
+    ]);
+    console.log("Reseller has been updated", response.rowCount);
+    return true;
+  } catch (e) {
+    console.log(e.message);
+    return false;
+  }
+}
+async function deleteReseller(id) {
+  try {
+    const query = "delete * from referral where id=$1";
+    const response = await pool.query(query, [id]);
+    console.log("Reseller is been deleted", response.rowCount);
+    return true;
+  } catch (e) {
+    console.log(e.message);
+    return false;
+  }
+}
 
 module.exports = {
   getCart,
@@ -816,5 +845,7 @@ module.exports = {
   getCategories,
   addCategory,
   deleteCategory,
-  updateProduct
+  updateProduct,
+  updateReseller,
+  deleteReseller
 };
