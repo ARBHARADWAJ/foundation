@@ -758,6 +758,33 @@ async function deleteCategory(name, type) {
   const response = await getCategories(); // Fetch updated categories after deletion
   return response;
 }
+async function updateProduct(
+  name,
+  description,
+  price,
+  subprice,
+  category,
+  subcategory,name2
+) {
+  const query =
+    "update products set name=$1,description=$2,price=$3,subprice=$4,category=$5,subcategory=$6 where name= $7";
+  try {
+    const response = await pool.query(query, [
+      name,
+      description,
+      price,
+      subprice,
+      category,
+      subcategory,
+      name2,
+    ]);
+    console.log("Record have been updated", response.rowCount);
+    return true;
+  } catch (e) {
+    console.log(e.message);
+    return false;
+  }
+}
 
 module.exports = {
   getCart,
@@ -788,4 +815,5 @@ module.exports = {
   getCategories,
   addCategory,
   deleteCategory,
+  updateProduct
 };

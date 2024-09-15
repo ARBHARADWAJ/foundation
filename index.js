@@ -32,6 +32,7 @@ const {
   getCategories,
   addCategory,
   deleteCategory,
+  updateProduct
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -138,7 +139,8 @@ app.post("/cartlist", async (req, res) => {
 });
 
 app.post("/addorder", upload.single("image"), async (req, res) => {
-  const { name, price,subprice, description, category,subcategory } = req.body;
+  const { name, price, subprice, description, category, subcategory } =
+    req.body;
   const image = req.file.buffer;
   try {
     const response = await addProduct(
@@ -147,7 +149,8 @@ app.post("/addorder", upload.single("image"), async (req, res) => {
       subprice,
       image,
       description,
-      category,subcategory
+      category,
+      subcategory
     );
     // console.log(response);
     if (response.rows.length > 0) {
@@ -560,7 +563,6 @@ app.post("/addCategories", async (req, res) => {
 });
 
 app.delete("/deleteCategory", async (req, res) => {
-  
   const { name, type } = req.body;
   try {
     const response = await deleteCategory(name, type);
@@ -576,6 +578,42 @@ app.delete("/deleteCategory", async (req, res) => {
       .json({ message: "record is not stored successful", value: false });
   }
 });
+
+app.post("/updateProduct", async (req, res) => {
+  const { name, description, price, subprice, category, subcategory,name2 } =
+    req.body;
+  console.log(name, description, price, subprice, category, subcategory,name2);
+
+  try {
+    const response = await updateProduct(
+      name,
+      description,
+      price,
+      subprice,
+      category,
+      subcategory,
+      name2
+    );
+    if (response) {
+      res.status(201).json({
+        message: "successfully deleted",
+        value: true,
+      });
+    } else {
+      res
+        .status(500)
+        .json({ message: "record is not updated successful", value: false });
+    }
+  } catch (e) {
+    console.log(e.message);
+    res
+      .status(500)
+      .json({ message: "record is not updated successful", value: false });
+  }
+});
+
+// app.post("/")
+
 // Start the server
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
