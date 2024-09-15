@@ -806,7 +806,7 @@ async function updateReseller(name, id) {
 }
 async function deleteReseller(id) {
   try {
-    const query = "delete * from referral where id=$1";
+    const query = "delete  from referral where id=$1";
     const response = await pool.query(query, [id]);
     console.log("Reseller is been deleted", response.rowCount);
     return true;
