@@ -764,10 +764,11 @@ async function updateProduct(
   price,
   subprice,
   category,
-  subcategory,name2
+  subcategory,
+  oldName // Renamed from name2 for clarity
 ) {
   const query =
-    "update products set name=$1,description=$2,price=$3,subprice=$4,category=$5,subcategory=$6 where name= $7";
+    "UPDATE products SET name=$1, description=$2, price=$3, subprice=$4, category=$5, subcategory=$6 WHERE name=$7";
   try {
     const response = await pool.query(query, [
       name,
@@ -776,9 +777,9 @@ async function updateProduct(
       subprice,
       category,
       subcategory,
-      name2,
+      oldName, // Use the renamed parameter
     ]);
-    console.log("Record have been updated", response.rowCount);
+    console.log("Record has been updated", response.rowCount);
     return true;
   } catch (e) {
     console.log(e.message);
