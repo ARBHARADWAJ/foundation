@@ -256,11 +256,13 @@ async function getCart(email, callback) {
   }
 }
 
-async function removeCartItem(email, name) {
+async function removeCartItem(email, name, quantity) {
   try {
     console.log("Called to delete the item from wishlist");
     await getJsonArray(email, async (err, jsonArray) => {
-      const updatedArray = jsonArray.filter((item) => item.name !== name);
+      const updatedArray = jsonArray.filter(
+        (item) => item.name !== name && item.quantity !== quantity
+      );
       await updateJsonArray(email, updatedArray, (err, result) => {
         if (err) {
           console.log(err.message);
@@ -847,5 +849,5 @@ module.exports = {
   deleteCategory,
   updateProduct,
   updateReseller,
-  deleteReseller
+  deleteReseller,
 };

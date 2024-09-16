@@ -242,10 +242,10 @@ app.post("/getUser", async (req, res) => {
 
 app.post("/removeCartItem", async (req, res) => {
   console.log("thii is delted");
-  const { email, name } = req.body;
-  console.log(email, " ", name);
-  const response = await removeCartItem(email, name);
-  console.log(response);
+  const { email, name,quantity } = req.body;
+  console.log(email, " ", name," ",quantity);
+  const response = await removeCartItem(email, name,quantity);
+  // console.log(response);
   console.log("deleted");
   if (response) {
     res.status(200).json({ message: "remvved from cart", value: true });
