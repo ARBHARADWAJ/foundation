@@ -260,6 +260,8 @@ async function removeCartItem(email, name, quantity) {
   try {
     console.log("Called to delete the item from wishlist");
     await getJsonArray(email, async (err, jsonArray) => {
+      console.log(item.name, "!==", name, " ", item.quantity, "!==", quantity);
+
       const updatedArray = jsonArray.filter(
         (item) => item.name !== name && item.quantity !== quantity
       );
