@@ -255,14 +255,29 @@ async function getCart(email, callback) {
     callback(err, null);
   }
 }
+async function filterNes(id, item) {
+  let arr2 = [];
+  for (let i = 0; i < item.length; i++) {
+
+    if (item[i].id !== id) {
+    console.log("not equal ",id," ",item[i]);
+    
+      arr2.push(item[i]);
+    }
+  }
+  return arr2;
+}
 
 async function removeCartItem(email, name, quantity, index) {
   try {
     console.log("Called to delete the item from wishlist");
     await getJsonArray(email, async (err, jsonArray) => {
       // console.log(item.name, "!==", name, " ", item.quantity, "!==", quantity);
-
-      const updatedArray = jsonArray.filter((item) => item.id !== index);
+      console.log(updatedArray,"cehkce for conce");
+      
+      const updatedArray = filterNes(index, jsonArray);
+      console.log("\ndone once",updatedArray);
+      
 
       await updateJsonArray(email, updatedArray, (err, result) => {
         if (err) {
