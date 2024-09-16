@@ -268,7 +268,7 @@ async function removeCartItem(email,name,quantity, id) {
       }
       console.log("jsonarray", jsonArray);
 
-      const updatedArray = jsonArray.filter((item) => item.id !== id);
+      const updatedArray = jsonArray.filter((item,index) => index!== id);
 
       await updateJsonArray(email, updatedArray, (err, result) => {
         if (err) {
