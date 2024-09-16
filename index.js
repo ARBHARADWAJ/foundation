@@ -242,9 +242,9 @@ app.post("/getUser", async (req, res) => {
 
 app.post("/removeCartItem", async (req, res) => {
   console.log("thii is delted");
-  const { email, name,quantity } = req.body;
+  const { email, name,quantity,index } = req.body;
   console.log(email, " ", name," ",quantity);
-  const response = await removeCartItem(email, name,quantity);
+  const response = await removeCartItem(email, name,quantity,index);
   // console.log(response);
   console.log("deleted");
   if (response) {
