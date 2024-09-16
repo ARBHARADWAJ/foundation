@@ -255,45 +255,37 @@ async function getCart(email, callback) {
     callback(err, null);
   }
 }
-async function filterNes(id, item) {
-  let arr2 = [];
-  for (let i = 0; i < item.length; i++) {
 
-    if (item[i].id !== id) {
-    console.log("not equal ",id," ",item[i]);
-    
-      arr2.push(item[i]);
-    }
-  }
-  return arr2;
-}
-
-async function removeCartItem(email, name, quantity, index) {
+async function removeCartItem(email,name,quantity, id) {
   try {
-    console.log("Called to delete the item from wishlist");
+    console.log("Called to delete the item from the wishlist");
+
+    // Fetch the current wishlist JSON array
     await getJsonArray(email, async (err, jsonArray) => {
-      // console.log(item.name, "!==", name, " ", item.quantity, "!==", quantity);
-      console.log(updatedArray,"cehkce for conce");
-      
-      const updatedArray = filterNes(index, jsonArray);
-      console.log("\ndone once",updatedArray);
-      
+      if (err) {
+        console.error("Error fetching wishlist:", err.message);
+        return;
+      }
+      console.log("jsonarray", jsonArray);
+
+      const updatedArray = jsonArray.filter((item) => item.id !== id);
 
       await updateJsonArray(email, updatedArray, (err, result) => {
         if (err) {
-          console.log(err.message);
+          console.error("Error updating wishlist:", err.message);
+          return;
         }
-        console.log("done");
+
+        console.log("Wishlist updated successfully.");
       });
-      console.log("Wishlist updated successfully.");
-      // return true; // Indicate success
     });
-    return true;
+
+    return true; // Indicate success
   } catch (err) {
     console.error("Error updating wishlist:", err.message);
     return false; // Indicate failure
   }
-} ////centralised table for the whislist need to be implemented please maintain that very goodlu please
+}
 
 async function placeOrder(
   product_id,
