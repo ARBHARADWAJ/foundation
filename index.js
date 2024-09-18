@@ -584,6 +584,9 @@ app.delete("/deleteCategory", async (req, res) => {
 app.post("/updateProduct", async (req, res) => {
   const { name, description, price, subprice, category, subcategory, name2 } =
     req.body;
+    const {data}=req.body;
+    console.log(data);
+    
   console.log(name, description, price, subprice, category, subcategory, name2);
 
   try {
