@@ -242,9 +242,9 @@ app.post("/getUser", async (req, res) => {
 
 app.post("/removeCartItem", async (req, res) => {
   console.log("thii is delted");
-  const { email, name,quantity,index } = req.body;
-  console.log(email, " ", name," ",quantity);
-  const response = await removeCartItem(email, name,quantity,index);
+  const { email, name, quantity, index } = req.body;
+  console.log(email, " ", name, " ", quantity);
+  const response = await removeCartItem(email, name, quantity, index);
   // console.log(response);
   console.log("deleted");
   if (response) {
@@ -582,11 +582,11 @@ app.delete("/deleteCategory", async (req, res) => {
 });
 
 app.post("/updateProduct", async (req, res) => {
+  const { data } = req.body;
+  console.log(data);
   const { name, description, price, subprice, category, subcategory, name2 } =
-    req.body;
-    const {data}=req.body;
-    console.log(data);
-    
+    data;
+
   console.log(name, description, price, subprice, category, subcategory, name2);
 
   try {
