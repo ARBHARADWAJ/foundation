@@ -347,7 +347,7 @@ app.post("/generateInvoice", async (req, res) => {
           console.error("Error sending file:", err);
           res.status(500).send("Internal Server Error");
         } else {
-          console.log("File sent successfully.");
+          console.log("File sent /downoaded successfully.");
         }
       });
     } else {
@@ -359,6 +359,32 @@ app.post("/generateInvoice", async (req, res) => {
       .json({ message: "Error generating invoice", error: error.message });
   }
 });
+
+app.post("/viewInvoice", async (req, res) => {
+  const { email, orderId } = req.body; // Include orderId in the request body
+  console.log(email, " ", orderId);
+
+  try {
+    const filePath = await generateUserOrderHistoryPDF(email, orderId);
+    if (filePath) {
+      res.sendFile(filePath, `${email}_order_${orderId}_invoice.pdf`, (err) => {
+        if (err) {
+          console.error("Error sending file:", err);
+          res.status(500).send("Internal Server Error");
+        } else {
+          console.log("File sent /downoaded successfully.");
+        }
+      });
+    } else {
+      res.status(404).json({ message: "No orders found for the user." });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error generating invoice", error: error.message });
+  }
+});
+
 
 app.get("/referalData", async (req, res) => {
   console.log("referral data");
