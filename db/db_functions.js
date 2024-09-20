@@ -256,7 +256,7 @@ async function getCart(email, callback) {
   }
 }
 
-async function removeCartItem(email,name,quantity, id) {
+async function removeCartItem(email, name, quantity, id) {
   try {
     console.log("Called to delete the item from the wishlist");
 
@@ -268,7 +268,7 @@ async function removeCartItem(email,name,quantity, id) {
       }
       console.log("jsonarray", jsonArray);
 
-      const updatedArray = jsonArray.filter((item ,index) => index!== id);
+      const updatedArray = jsonArray.filter((item, index) => index !== id);
 
       await updateJsonArray(email, updatedArray, (err, result) => {
         if (err) {
@@ -494,24 +494,26 @@ async function generateUserOrderHistoryPDF(email, orderId) {
 
     let totalAmount = 0;
     result.rows.forEach((order, index) => {
-      console.log(order,"]]");
-      if(order.id===orderId){
-      doc.fontSize(15).text(`Order #${index + 1}`);
-      doc.fontSize(12).text(`Product Name: ${order.name}`);
-      doc.fontSize(12).text(`Description: ${order.description}`);
-      doc.fontSize(12).text(`Price: ₹${order.price}`);
-      doc.fontSize(12).text(`Quantity: ${order.quantity}`);
-      doc.fontSize(12).text(`Coupon: ${order.coupon || "N/A"}`);
-      doc
-        .fontSize(12)
-        .text(`Date: ${new Date(order.created_at).toLocaleString()}`);
-      // if (order.image) {
-      //   doc.image(order.image, { width: 100, height: 100 });
-      // }
-      doc.moveDown();
+      console.log(order.id, "]]", orderId);
+      if (order.id === orderId) {
+        doc.fontSize(15).text(`Order #${index + 1}`);
+        doc.fontSize(12).text(`Product Name: ${order.name}`);
+        doc.fontSize(12).text(`Description: ${order.description}`);
+        doc.fontSize(12).text(`Price: ₹${order.price}`);
+        doc.fontSize(12).text(`Quantity: ${order.quantity}`);
+        doc.fontSize(12).text(`Coupon: ${order.coupon || "N/A"}`);
+        doc
+          .fontSize(12)
+          .text(`Date: ${new Date(order.created_at).toLocaleString()}`);
+        // if (order.image) {
+        //   doc.image(order.image, { width: 100, height: 100 });
+        // }
+        doc.moveDown();
 
-      totalAmount += parseFloat(order.price) * parseFloat(order.quantity);
-  }});
+        totalAmount += parseFloat(order.price) * parseFloat(order.quantity);
+        console.log(order);
+      }
+    });
 
     doc.moveDown();
     doc.fontSize(18).text(`Total Amount: ₹${totalAmount}`);
