@@ -363,9 +363,9 @@ app.post("/generateInvoice", async (req, res) => {
 app.post("/viewInvoice", async (req, res) => {
   const { email, orderId } = req.body; // Include orderId in the request body
   console.log(email, " ", orderId);
+  const filePath = await generateUserOrderHistoryPDF(email, orderId);
 
   try {
-    const filePath = await generateUserOrderHistoryPDF(email, orderId);
     if (filePath) {
       res.sendFile(filePath, `${email}_order_${orderId}_invoice.pdf`, (err) => {
         if (err) {
@@ -384,7 +384,6 @@ app.post("/viewInvoice", async (req, res) => {
       .json({ message: "Error generating invoice", error: error.message });
   }
 });
-
 
 app.get("/referalData", async (req, res) => {
   console.log("referral data");
