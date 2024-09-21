@@ -335,6 +335,8 @@ async function placeOrderList(data, email, coupon, amount) {
   //need to change its actual problem it need to be done the payent is done
 
   const orderid = generateRandomFiveDigitNumber();
+  console.log(orderid);
+  
   for (let product of data) {
     console.log("Processing product:", product);
     let handle = await placeOrder(
@@ -411,7 +413,7 @@ async function OrdersList() {
 async function SinglesOrdersList(email) {
   try {
     const query = `
-      SELECT o.id, o.product_id, p.name AS product_name,o.user_email, o.quantity, o.price, p.image
+      SELECT o.id,o.ordersid, o.product_id, p.name AS product_name,o.user_email, o.quantity, o.price, p.image
       FROM orders o 
       JOIN products p ON o.product_id = p.id 
       where o.user_email=$1
