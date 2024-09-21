@@ -508,7 +508,7 @@ async function generateUserOrderHistoryPDF(email, ordersId) {
     result.rows.forEach((order, index) => {
       console.log(order.id, "]]", ordersId);
       // if (order.ordersid === ordersId) {
-      doc.fontSize(15).text(`Order #${order.ordersid}`);
+      doc.fontSize(15).text(`Order #${ordersid}`);
       doc.fontSize(12).text(`Product Name: ${order.name}`);
       doc.fontSize(12).text(`Description: ${order.description}`);
       doc.fontSize(12).text(`Price: ₹${order.price}`);
