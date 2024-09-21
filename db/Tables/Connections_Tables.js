@@ -67,6 +67,7 @@ pool.query(createsubQuery, (err, results) => {
 const createOrdersQuery = `
     CREATE TABLE IF NOT EXISTS orders (
     id SERIAL PRIMARY KEY,
+    ordersid int,
     price DECIMAL(10, 2) NOT NULL,
     quantity DECIMAL(10,2) NOT NULL,
     product_id INT NOT NULL,

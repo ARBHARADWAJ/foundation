@@ -294,14 +294,15 @@ async function placeOrder(
   email,
   coupon,
   reference_no,
-  response
+  response,
+  ordersid
 ) {
-  console.log(product_id, price, quantity, email, coupon, response);
+  console.log(product_id, price, quantity, email, coupon, response, ordersid);
 
   try {
     const query = `
-      INSERT INTO orders (price, quantity, product_id, user_email,coupon,reference_no,response)
-      VALUES ($1, $2, $3, $4,$5,$6,$7) RETURNING *;
+      INSERT INTO orders (price, quantity, product_id, user_email,coupon,reference_no,response,ordersid)
+      VALUES ($1, $2, $3, $4,$5,$6,$7,$8) RETURNING *;
     `;
     const values = [
       price,
@@ -311,6 +312,7 @@ async function placeOrder(
       coupon,
       reference_no,
       response,
+      ordersid,
     ];
     const result = await pool.query(query, values);
     console.log("Order placed successfully:", result.rows);
@@ -320,7 +322,9 @@ async function placeOrder(
     return false;
   }
 }
-
+function generateRandomFiveDigitNumber() {
+  return Math.floor(10000 + Math.random() * 90000);
+}
 // Function to place multiple orders
 async function placeOrderList(data, email, coupon, amount) {
   let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
@@ -328,7 +332,9 @@ async function placeOrderList(data, email, coupon, amount) {
 
   let url = getPaymentUrl(amount, randomSixDigitNumber);
   console.log(url);
+  //need to change its actual problem it need to be done the payent is done
 
+  const orderid = generateRandomFiveDigitNumber();
   for (let product of data) {
     console.log("Processing product:", product);
     let handle = await placeOrder(
@@ -338,7 +344,8 @@ async function placeOrderList(data, email, coupon, amount) {
       email,
       coupon,
       randomSixDigitNumber + "",
-      {}
+      {},
+      orderid
     );
     if (!handle) {
       console.error("Failed to place order for product:", product);
@@ -462,7 +469,7 @@ async function checkCoupon(couponName) {
   }
 }
 
-async function generateUserOrderHistoryPDF(email, orderId) {
+async function generateUserOrderHistoryPDF(email, ordersId) {
   const query = `
     SELECT o.id, o.price, o.quantity, o.created_at, o.coupon, p.name, p.description, p.image 
     FROM orders o
@@ -482,7 +489,10 @@ async function generateUserOrderHistoryPDF(email, orderId) {
     );
 
     const doc = new PDFDocument();
-    const filePath = path.join(__dirname, `${email}_order_history.pdf`);
+    const filePath = path.join(
+      __dirname,
+      `${email}_${ordersId}_order_history.pdf`
+    );
 
     doc.pipe(fs.createWriteStream(filePath));
 
@@ -494,9 +504,9 @@ async function generateUserOrderHistoryPDF(email, orderId) {
 
     let totalAmount = 0;
     result.rows.forEach((order, index) => {
-      console.log(order.id, "]]", orderId);
-      if (order.id === orderId) {
-        doc.fontSize(15).text(`Order #${index + 1}`);
+      console.log(order.id, "]]", ordersId);
+      if (order.ordersid === ordersId) {
+        doc.fontSize(15).text(`Order #${order.ordersid}`);
         doc.fontSize(12).text(`Product Name: ${order.name}`);
         doc.fontSize(12).text(`Description: ${order.description}`);
         doc.fontSize(12).text(`Price: ₹${order.price}`);

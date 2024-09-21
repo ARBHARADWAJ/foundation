@@ -361,13 +361,13 @@ app.post("/generateInvoice", async (req, res) => {
 });
 
 app.post("/viewInvoice", async (req, res) => {
-  const { email, orderId } = req.body; // Include orderId in the request body
-  console.log(email, " ", orderId);
-  const filePath = await generateUserOrderHistoryPDF(email, orderId);
-
+  const { email, ordersId } = req.body; // Include orderId in the request body
+  console.log(email, " ", ordersId);
+  
   try {
+    const filePath = await generateUserOrderHistoryPDF(email, ordersId);
     if (filePath) {
-      res.sendFile(filePath, `${email}_order_${orderId}_invoice.pdf`, (err) => {
+      res.sendFile(filePath, `${email}_order_${ordersId}_invoice.pdf`, (err) => {
         if (err) {
           console.error("Error sending file:", err);
           res.status(500).send("Internal Server Error");
