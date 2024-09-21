@@ -336,7 +336,7 @@ async function placeOrderList(data, email, coupon, amount) {
 
   const orderid = generateRandomFiveDigitNumber();
   console.log(orderid);
-  
+
   for (let product of data) {
     console.log("Processing product:", product);
     let handle = await placeOrder(
@@ -476,17 +476,17 @@ async function generateUserOrderHistoryPDF(email, ordersId) {
     SELECT o.id, o.price, o.quantity, o.created_at, o.coupon, p.name, p.description, p.image 
     FROM orders o
     JOIN products p ON o.product_id = p.id
-    WHERE o.user_email = $1;
+    WHERE o.user_email = $1 and o.ordersid=$2;
   `;
 
   try {
-    const result = await pool.query(query, [email]);
+    const result = await pool.query(query, [email, ordersId]);
     if (result.rows.length === 0) {
       throw new Error("No orders found for the user.");
     }
     console.log(
       "=========================",
-      result.rows,
+      result.rows.length,
       "========================="
     );
 
@@ -507,24 +507,24 @@ async function generateUserOrderHistoryPDF(email, ordersId) {
     let totalAmount = 0;
     result.rows.forEach((order, index) => {
       console.log(order.id, "]]", ordersId);
-      if (order.ordersid === ordersId) {
-        doc.fontSize(15).text(`Order #${order.ordersid}`);
-        doc.fontSize(12).text(`Product Name: ${order.name}`);
-        doc.fontSize(12).text(`Description: ${order.description}`);
-        doc.fontSize(12).text(`Price: ₹${order.price}`);
-        doc.fontSize(12).text(`Quantity: ${order.quantity}`);
-        doc.fontSize(12).text(`Coupon: ${order.coupon || "N/A"}`);
-        doc
-          .fontSize(12)
-          .text(`Date: ${new Date(order.created_at).toLocaleString()}`);
-        // if (order.image) {
-        //   doc.image(order.image, { width: 100, height: 100 });
-        // }
-        doc.moveDown();
+      // if (order.ordersid === ordersId) {
+      doc.fontSize(15).text(`Order #${order.ordersid}`);
+      doc.fontSize(12).text(`Product Name: ${order.name}`);
+      doc.fontSize(12).text(`Description: ${order.description}`);
+      doc.fontSize(12).text(`Price: ₹${order.price}`);
+      doc.fontSize(12).text(`Quantity: ${order.quantity}`);
+      doc.fontSize(12).text(`Coupon: ${order.coupon || "N/A"}`);
+      doc
+        .fontSize(12)
+        .text(`Date: ${new Date(order.created_at).toLocaleString()}`);
+      // if (order.image) {
+      //   doc.image(order.image, { width: 100, height: 100 });
+      // }
+      doc.moveDown();
 
-        totalAmount += parseFloat(order.price) * parseFloat(order.quantity);
-        console.log(order);
-      }
+      totalAmount += parseFloat(order.price) * parseFloat(order.quantity);
+      console.log(order);
+      // }
     });
 
     doc.moveDown();
