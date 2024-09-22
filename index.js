@@ -337,10 +337,12 @@ app.post("/checkCoupon", async (req, res) => {
 
 app.post("/generateInvoice", async (req, res) => {
   const { email, orderId } = req.body; // Include orderId in the request body
-  console.log(email, " ", orderId);
+  // console.log(email, " ", orderId);
 
   try {
     const filePath = await generateUserOrderHistoryPDF(email, orderId);
+    console.log(filePath);
+    
     if (filePath) {
       res.download(filePath, `${email}_order_${orderId}_invoice.pdf`, (err) => {
         if (err) {
@@ -366,6 +368,8 @@ app.post("/viewInvoice", async (req, res) => {
   
   try {
     const filePath = await generateUserOrderHistoryPDF(email, ordersId);
+    console.log(filePath);
+    
     if (filePath) {
       res.sendFile(filePath, `${email}_order_${ordersId}_invoice.pdf`, (err) => {
         if (err) {

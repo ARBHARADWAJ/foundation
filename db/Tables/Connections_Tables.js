@@ -20,7 +20,14 @@ const createTableQuery = `
       whtlst JSON,
       role VARCHAR(255) NOT NULL,
       referral VARCHAR(255),
-      address VARCHAR(255)
+      address VARCHAR(255),
+      
+      bank_details varchar(255),
+      district varchar(75),
+      state varchar(75),
+      pincode int,
+      city varchar(75),
+      landmark varchar(100)
     );
   `;
 pool.query(createTableQuery, (err, results) => {
