@@ -844,8 +844,8 @@ async function deleteReseller(id) {
 
 async function toogleshowhide(name, type, value) {
   try {
-    const query = "update $1 set status=$2 where name=$3";
-    const res = await pool.query(query, [type, value, name]);
+    const query = "update ${type} set status=$1 where name=$2";
+    const res = await pool.query(query, [!value, name]);
     console.log("succesfully updated the table");
     return true;
   } catch (error) {
