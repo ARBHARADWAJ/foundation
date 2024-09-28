@@ -726,8 +726,8 @@ async function getSortedOrdersByReferral(referralName, sortBy) {
   }
 }
 async function getCategories() {
-  const query1 = "select category from categories";
-  const query2 = "select subcategory from subcategories";
+  const query1 = "select * from categories";
+  const query2 = "select * from subcategories";
   const category = await pool.query(query1);
   const subcategory = await pool.query(query2);
   const response = {};
