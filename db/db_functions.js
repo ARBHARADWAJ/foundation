@@ -844,9 +844,9 @@ async function deleteReseller(id) {
 
 async function toogleshowhide(name, type, value) {
   try {
-    const query = "update ${type} set status=$1 where name=$2";
+    const query = `UPDATE ${type} SET status = $1 WHERE name = $2`;
     const res = await pool.query(query, [!value, name]);
-    console.log("succesfully updated the table");
+    console.log("Successfully updated the table");
     return true;
   } catch (error) {
     console.log(error.message);
@@ -886,5 +886,5 @@ module.exports = {
   updateProduct,
   updateReseller,
   deleteReseller,
-  toogleshowhide
+  toogleshowhide,
 };
