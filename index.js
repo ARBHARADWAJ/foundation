@@ -35,6 +35,7 @@ const {
   updateProduct,
   updateReseller,
   deleteReseller,
+  toogleshowhide,
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -342,7 +343,7 @@ app.post("/generateInvoice", async (req, res) => {
   try {
     const filePath = await generateUserOrderHistoryPDF(email, orderId);
     console.log(filePath);
-    
+
     if (filePath) {
       res.download(filePath, `${email}_order_${orderId}_invoice.pdf`, (err) => {
         if (err) {
@@ -365,20 +366,24 @@ app.post("/generateInvoice", async (req, res) => {
 app.post("/viewInvoice", async (req, res) => {
   const { email, ordersId } = req.body; // Include orderId in the request body
   console.log(email, " ", ordersId);
-  
+
   try {
     const filePath = await generateUserOrderHistoryPDF(email, ordersId);
     console.log(filePath);
-    
+
     if (filePath) {
-      res.sendFile(filePath, `${email}_order_${ordersId}_invoice.pdf`, (err) => {
-        if (err) {
-          console.error("Error sending file:", err);
-          res.status(500).send("Internal Server Error");
-        } else {
-          console.log("File sent /downoaded successfully.");
+      res.sendFile(
+        filePath,
+        `${email}_order_${ordersId}_invoice.pdf`,
+        (err) => {
+          if (err) {
+            console.error("Error sending file:", err);
+            res.status(500).send("Internal Server Error");
+          } else {
+            console.log("File sent /downoaded successfully.");
+          }
         }
-      });
+      );
     } else {
       res.status(404).json({ message: "No orders found for the user." });
     }
@@ -429,25 +434,6 @@ app.post("/applyReferral", async (req, res) => {
   }
 });
 
-// app.post("/processStatus", async (req, res) => {
-//   console.log("processStatus");
-//   try {
-//     const { email, newStatus } = req.body;
-//     console.log("referal update");
-
-//     console.log(email, " --", newStatus);
-
-//     const response = await updateReferralStatus(email, newStatus);
-//     res.status(201).json({ value: true, status: "updated" });
-//   } catch (e) {
-//     console.log(e);
-//   }
-// });
-
-// getReferralStatusByEmail,
-// getOrdersByReferee
-
-// getReferrals
 app.post("/getReferrals", async (req, res) => {
   console.log("get the rederals rable");
   const { name } = req.body;
@@ -538,13 +524,6 @@ app.post("/getSortedOrdersByReferral", async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 });
-
-// app.post("/payment-response", async (req, res) => {
-//   res.json({
-//     success: true,
-//     message: "Payment response received and processed.",
-//   });
-// });
 
 app.post("/payment-response", async (req, res) => {
   console.log(req.body);
@@ -688,6 +667,20 @@ app.post("/deleteReseller", async (req, res) => {
     res
       .status(500)
       .json({ message: "record is not deleted successful", value: false });
+  }
+});
+app.post("/updatevisibility", async (req, res) => {
+  const { name, type, value } = req.body;
+  try {
+    const response = await toogleshowhide(name, type, value);
+    if (response) {
+      res.status(200).json({ value: true });
+    } else {
+      res.status(500).json({ value: false });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ value: false });
   }
 });
 
