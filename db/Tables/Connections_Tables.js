@@ -21,7 +21,6 @@ const createTableQuery = `
       role VARCHAR(255) NOT NULL,
       referral VARCHAR(255),
       address VARCHAR(255),
-      
       bank_details varchar(255),
       district varchar(75),
       state varchar(75),

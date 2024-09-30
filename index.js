@@ -36,6 +36,7 @@ const {
   updateReseller,
   deleteReseller,
   toogleshowhide,
+  updateUserProfile,
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -675,6 +676,39 @@ app.post("/updatevisibility", async (req, res) => {
     const response = await toogleshowhide(name, type, value);
     if (response) {
       res.status(200).json({ value: true });
+    } else {
+      res.status(500).json({ value: false });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ value: false });
+  }
+});
+app.post("/updateUserDetails", async (req, res) => {
+  const {
+    email,
+    address,
+    bank_details,
+    district,
+    state,
+    pincode,
+    city,
+    landmark,
+  } = req.body;
+
+  try {
+    const response = await updateUserProfile(
+      email,
+      address,
+      bank_details,
+      district,
+      state,
+      pincode,
+      city,
+      landmark
+    );
+    if (response) {
+      res.status(201).send({ value: true });
     } else {
       res.status(500).json({ value: false });
     }

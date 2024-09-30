@@ -858,6 +858,57 @@ async function toogleshowhide(name, type, value) {
     return false;
   }
 }
+async function updateUserProfile(
+  email,
+  address,
+  bank_details,
+  district,
+  state,
+  pincode,
+  city,
+  landmark
+) {
+  try {
+    const updateQuery = `
+      UPDATE users
+      SET 
+        address = $1,
+        bank_details = $2,
+        district = $3,
+        state = $4,
+        pincode = $5,
+        city = $6,
+        landmark = $7
+      WHERE email = $8
+    `;
+
+    // Execute the query with provided values
+    const res = await pool.query(updateQuery, [
+      address,
+      bank_details,
+      district,
+      state,
+      pincode,
+      city,
+      landmark,
+      email,
+    ]);
+
+    // If the update affects at least one row, return true
+    if (res.rowCount > 0) {
+      return true;
+    } else {
+      // If no rows were affected, return false
+      return false;
+    }
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    return false;
+  } finally {
+    // Close the database connection
+    await client.end();
+  }
+}
 
 module.exports = {
   getCart,
@@ -892,4 +943,5 @@ module.exports = {
   updateReseller,
   deleteReseller,
   toogleshowhide,
+  updateUserProfile
 };
