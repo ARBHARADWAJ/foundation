@@ -904,9 +904,6 @@ async function updateUserProfile(
   } catch (error) {
     console.error("Error updating user profile:", error);
     return false;
-  } finally {
-    // Close the database connection
-    await client.end();
   }
 }
 
@@ -943,5 +940,5 @@ module.exports = {
   updateReseller,
   deleteReseller,
   toogleshowhide,
-  updateUserProfile
+  updateUserProfile,
 };
