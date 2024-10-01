@@ -1,14 +1,12 @@
 const crypto = require("crypto");
 
 // Global Variables
-const merchantId = "385094";
-// "140157";
-//
-const encryptionKey = "3869683050905603";
-//"1400011601505020";
-//
-const subMerchantId = "25";
-//45
+const merchantId = "140157";
+//385094
+const encryptionKey = "1400011601505020";
+//3869683050905603
+const subMerchantId = "45";
+//25
 const paymode = "9";
 //9
 
