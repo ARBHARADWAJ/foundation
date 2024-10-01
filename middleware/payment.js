@@ -1,11 +1,16 @@
 const crypto = require("crypto");
 
 // Global Variables
-const merchantId = "140157";
-const encryptionKey = "1400011601505020";
-const subMerchantId = "45";
+const merchantId = "385094";
+// "140157";
+//
+const encryptionKey = "3869683050905603";
+//"1400011601505020";
+//
+const subMerchantId = "25";
+//45
 const paymode = "9";
-
+//9
 
 const returnUrl = "https://api.farm2kitchen.co.in/payment-response";
 const DEFAULT_BASE_URL = "https://eazypayuat.icicibank.com/EazyPG?";
