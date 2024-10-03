@@ -337,7 +337,7 @@ async function placeOrderList(data, email, coupon, amount) {
   const orderid = generateRandomFiveDigitNumber();
   console.log(orderid);
 
-  for (let product of data) {
+  /*for (let product of data) {
     console.log("Processing product:", product);
     let handle = await placeOrder(
       product.id,
@@ -358,7 +358,7 @@ async function placeOrderList(data, email, coupon, amount) {
     if (err) {
       console.log(err.message);
     }
-  });
+  });*/
   return url;
 }
 

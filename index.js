@@ -263,6 +263,8 @@ app.post("/placeOrder", async (req, res) => {
 });
 
 app.post("/placeOrderList", async (req, res) => {
+  console.log("entered");
+  
   const { data, email, coupon, amount } = req.body;
   console.log(req.body);
   try {
