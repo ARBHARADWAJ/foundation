@@ -56,7 +56,7 @@ function getOptionalField(optionalField = null) {
   if (optionalField !== null) {
     return getEncryptValue(optionalField);
   }
-  return null;
+  return "";
 }
 
 function getAmount(amount) {
@@ -89,6 +89,15 @@ function getEncryptValue(data) {
   encrypted += cipher.final("base64");
   return encrypted;
 }
+
+// const crypto = require("crypto");
+
+// function encrypt(plainText, key, outputEncoding = "base64") {
+// const cipher = crypto.createCipheriv("aes-128-ecb", key, null);
+// return Buffer.concat([cipher.update(plainText), cipher.final()]).toString(
+// outputEncoding
+// );
+// }
 
 // Generate a random 6-digit number
 // let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
