@@ -52,7 +52,7 @@ function getMandatoryField(amount, referenceNo) {
   return getEncryptValue(`${referenceNo}|${subMerchantId}|${amount}`);
 }
 
-function getOptionalField(optionalField = null) {
+function getOptionalField(optionalField = "") {
   if (optionalField !== null) {
     return getEncryptValue(optionalField);
   }
