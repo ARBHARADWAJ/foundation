@@ -241,7 +241,7 @@ async function getpic(id) {
   try {
     const result = await pool.query(query, [id]);
     if (result.rows.length > 0) {
-      return result.rows[0].image;
+      return result.rows[0].image.toString("base64");
     } else {
       return ""; // Return an empty string if no image is found
     }
