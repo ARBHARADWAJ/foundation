@@ -267,7 +267,7 @@ async function getCart(email, callback) {
           return item; // Return updated item
         })
       );
-
+      console.log("returived and improved ", finalResult);
       callback(null, finalResult); // Return the final result with images
     } else {
       console.log("No user found with the given email.");
@@ -278,7 +278,6 @@ async function getCart(email, callback) {
     callback(err, null);
   }
 }
-
 
 async function removeCartItem(email, name, quantity, id) {
   try {
