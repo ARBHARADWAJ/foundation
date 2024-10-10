@@ -236,6 +236,19 @@ const insertCart = async (id, name, price, quantity, email) => {
     });
   });
 };
+async function getpic(id) {
+  const query = "SELECT image FROM products WHERE id = $1";
+  try {
+    const result = await pool.query(query, [id]);
+    if (result.rows.length > 0) {
+      return result.rows[0].image;
+    } else {
+      return ""; // Return an empty string if no image is found
+    }
+  } catch (error) {
+    return ""; // Return an empty string in case of an error
+  }
+}
 
 async function getCart(email, callback) {
   const query = `
@@ -245,7 +258,17 @@ async function getCart(email, callback) {
     const result = await pool.query(query, [email]);
     if (result.rows.length > 0) {
       console.log("User retrieved successfully:", result.rows);
-      callback(null, result.rows);
+      const rows = result.rows[0].whtlst; // Assuming `whtlst` is an array of objects
+
+      // Map over the wishlist and fetch the image for each item
+      const finalResult = await Promise.all(
+        rows.map(async (item) => {
+          item.image = await getpic(item.id); // Fetch and add image to each item
+          return item; // Return updated item
+        })
+      );
+
+      callback(null, finalResult); // Return the final result with images
     } else {
       console.log("No user found with the given email.");
       callback(null, null);
@@ -255,6 +278,7 @@ async function getCart(email, callback) {
     callback(err, null);
   }
 }
+
 
 async function removeCartItem(email, name, quantity, id) {
   try {
