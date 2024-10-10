@@ -257,7 +257,7 @@ async function getCart(email, callback) {
   try {
     const result = await pool.query(query, [email]);
     if (result.rows.length > 0) {
-      console.log("User retrieved successfully:", result.rows);
+      // console.log("User retrieved successfully:", result.rows);
       const rows = result.rows[0].whtlst; // Assuming `whtlst` is an array of objects
 
       // Map over the wishlist and fetch the image for each item
@@ -267,7 +267,7 @@ async function getCart(email, callback) {
           return item; // Return updated item
         })
       );
-      console.log("returived and improved ", finalResult);
+      // console.log("returived and improved ", finalResult);
       callback(null, finalResult); // Return the final result with images
     } else {
       console.log("No user found with the given email.");

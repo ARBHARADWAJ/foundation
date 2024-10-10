@@ -131,7 +131,7 @@ app.post("/cartlist", async (req, res) => {
       if (err) {
         console.log(err);
       } else {
-        console.log(data);
+        console.log("see this the final data",data);
         res.status(200).json({ data: data, value: true });
       }
     });
