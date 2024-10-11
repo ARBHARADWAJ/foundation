@@ -13,7 +13,7 @@ const paymode = "9";
 const returnUrl = "https://api.farm2kitchen.co.in/payment-response";
 const DEFAULT_BASE_URL = "https://eazypay.icicibank.com/EazyPG?";
 
-function getPaymentUrl(amount, referenceNo, optionalField = null) {
+function getPaymentUrl(amount, referenceNo, optionalField = "") {
   const mandatoryField = getMandatoryField(amount, referenceNo);
   const optionalFieldValue = getOptionalField(optionalField);
   const encryptedAmount = getAmount(amount);
