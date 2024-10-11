@@ -49,7 +49,9 @@ function generatePaymentUrl(
 }
 
 function getMandatoryField(amount, referenceNo) {
-  return getEncryptValue(`${referenceNo}|${subMerchantId}|${amount}`);
+  return getEncryptValue(
+    `${referenceNo}|${subMerchantId}|${amount}|ABC|9876543212|ABC@GMAIL.COM|ABC`
+  );
 }
 
 function getOptionalField(optionalField = "") {
