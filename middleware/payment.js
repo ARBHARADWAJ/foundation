@@ -66,6 +66,10 @@ function generatePaymentUrl(
 
 function getMandatoryField(amount, referenceNo, orderid, phno, name, email) {
   //here 1 ois amount change it after words
+  console.log(typeof name);
+  console.log(typeof phno);
+  console.log(typeof orderid);
+  
   return getEncryptValue(
     `${referenceNo}|${subMerchantId}|1|${name}|${phno}|${email}|${orderid}`
   );
