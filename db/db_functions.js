@@ -352,7 +352,6 @@ function generateRandomFiveDigitNumber() {
 }
 // Function to place multiple orders
 async function placeOrderList(data, email, coupon, amount) {
-  
   let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
   console.log("Placing order list:", data);
   //fetch the users details; name,phno,email
@@ -366,8 +365,7 @@ async function placeOrderList(data, email, coupon, amount) {
   console.log(orderid);
 
   let url = getPaymentUrl(
-    // amount,
-    1,
+    amount,
     randomSixDigitNumber,
     "",
     orderid,
