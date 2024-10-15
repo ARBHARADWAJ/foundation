@@ -5,6 +5,7 @@ const PDFDocument = require("pdfkit");
 const crypto = require("crypto");
 const { pool, createTableIfNotExists } = require("./Tables/Connections_Tables");
 const { getPaymentUrl } = require("../middleware/payment");
+const { notDeepEqual } = require("assert");
 async function createUser(
   name,
   email,
@@ -324,8 +325,8 @@ async function placeOrder(
 
   try {
     const query = `
-      INSERT INTO orders (price, quantity, product_id, user_email,coupon,reference_no,response,ordersid)
-      VALUES ($1, $2, $3, $4,$5,$6,$7,$8) RETURNING *;
+      INSERT INTO orders (price, quantity, product_id, user_email,coupon,reference_no,response,ordersid,status)
+      VALUES ($1, $2, $3, $4,$5,$6,$7,$8,$9) RETURNING *;
     `;
     const values = [
       price,
@@ -336,6 +337,7 @@ async function placeOrder(
       reference_no,
       response,
       ordersid,
+      "",
     ];
     const result = await pool.query(query, values);
     console.log("Order placed successfully:", result.rows);
@@ -352,15 +354,28 @@ function generateRandomFiveDigitNumber() {
 async function placeOrderList(data, email, coupon, amount) {
   let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
   console.log("Placing order list:", data);
+  //fetch the users details; name,phno,email
+  let userdata = await getUserByEmail(email);
+  const { phno, name } = userdata;
 
-  let url = getPaymentUrl(amount, randomSixDigitNumber);
-  console.log(url);
-  //need to change its actual problem it need to be done the payent is done
+  //order id add these to teh url and send it to the url return and see whthere it workds
+  //  or not
 
   const orderid = generateRandomFiveDigitNumber();
   console.log(orderid);
 
-  /*for (let product of data) {
+  let url = getPaymentUrl(
+    amount,
+    randomSixDigitNumber,
+    orderid,
+    phno,
+    name,
+    email
+  );
+  console.log(url);
+  //need to change its actual problem it need to be done the payent is done
+
+  for (let product of data) {
     console.log("Processing product:", product);
     let handle = await placeOrder(
       product.id,
@@ -377,33 +392,42 @@ async function placeOrderList(data, email, coupon, amount) {
       return false;
     }
   }
-  await updateJsonArray(email, [], (err, res) => {
-    if (err) {
-      console.log(err.message);
-    }
-  });*/
+
   return url;
 }
 
 async function modifyOrderPaymentResponse(responsedata) {
-  let ReferenceNo = responsedata.ReferenceNo.trim();
-  console.log(typeof ReferenceNo);
-  const query = `
-  UPDATE orders
-  SET response = $2
-  WHERE reference_no = $1;
-  `;
-  const result = await pool.query(query, [ReferenceNo, responsedata]);
-  console.log("there is the result of payment", result);
   try {
-    // console.log("updated the status fo order reference no:", ReferenceNo);
-    if (result) {
+    let ReferenceNo = responsedata.ReferenceNo.trim();
+    console.log(ReferenceNo);
+
+    const updateQuery = `
+      UPDATE orders
+      SET response = $2,status='initialized'
+      WHERE reference_no = $1
+      RETURNING email;
+    `;
+    const updateResult = await pool.query(updateQuery, [
+      ReferenceNo,
+      responsedata,
+    ]);
+
+    if (updateResult.rows.length > 0) {
+      const { email } = updateResult.rows[0];
+      console.log("Payment update result:", updateResult);
+      await updateJsonArray(email, [], (err, res) => {
+        if (err) {
+          console.log("Error updating JSON array:", err.message);
+        }
+      });
+      console.log("JSON array updated for email:", email);
       return true;
     } else {
+      console.log("No email found for the given reference number.");
       return false;
     }
-  } catch (e) {
-    console.log(e.message);
+  } catch (error) {
+    console.log("Error in modifyOrderPaymentResponse:", error.message);
     return false;
   }
 }
@@ -436,12 +460,14 @@ async function OrdersList() {
 async function SinglesOrdersList(email) {
   try {
     const query = `
-      SELECT o.id,o.ordersid, o.product_id, p.name AS product_name,o.user_email, o.quantity, o.price, p.image
-      FROM orders o 
-      JOIN products p ON o.product_id = p.id 
-      where o.user_email=$1
-      ;
-    `;
+    SELECT o.id, o.ordersid, o.product_id, p.name AS product_name, o.user_email, 
+           o.quantity, o.price, p.image
+    FROM orders o 
+    JOIN products p ON o.product_id = p.id 
+    WHERE o.user_email = $1 
+      AND o.status = 'initialized';
+  `;
+
     const res = await pool.query(query, [email]);
     console.log("Retrieved orders:");
     const orders = res.rows.map((order) => {

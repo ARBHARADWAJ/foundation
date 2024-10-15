@@ -83,7 +83,8 @@ const createOrdersQuery = `
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE,
     reference_no VARCHAR,
-    response JSON
+    response JSON,
+    status varchar(20)
   );  `;
 pool.query(createOrdersQuery, (err, results) => {
   if (err) {

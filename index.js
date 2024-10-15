@@ -264,7 +264,7 @@ app.post("/placeOrder", async (req, res) => {
 
 app.post("/placeOrderList", async (req, res) => {
   console.log("entered");
-  
+
   const { data, email, coupon, amount } = req.body;
   console.log(req.body);
   try {
@@ -309,7 +309,7 @@ app.get("/ordersList", async (req, res) => {
   }
 });
 app.post("/singleordersList", async (req, res) => {
-  console.log("entered");
+  // console.log("entered");
   const { email } = req.body;
   try {
     const response = await SinglesOrdersList(email);
@@ -538,7 +538,8 @@ app.post("/payment-response", async (req, res) => {
 
   // Print all request data
   // console.log("Request Data: ", allRequestData);
-  const response = await modifyOrderPaymentResponse(allRequestData);
+  const response = await modifyOrderPaymentResponse(allRequestData); //we can use it for the payment or request id updation
+
   // console.log(response);
 
   res.redirect("https://farm2kitchen.co.in/successpage");
