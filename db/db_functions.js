@@ -408,7 +408,7 @@ async function modifyOrderPaymentResponse(responsedata) {
       UPDATE orders
       SET response = $2,status='initialized'
       WHERE reference_no = $1
-      RETURNING email;
+      RETURNING user_email;
     `;
     const updateResult = await pool.query(updateQuery, [
       ReferenceNo,
