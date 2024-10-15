@@ -352,6 +352,7 @@ function generateRandomFiveDigitNumber() {
 }
 // Function to place multiple orders
 async function placeOrderList(data, email, coupon, amount) {
+  
   let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
   console.log("Placing order list:", data);
   //fetch the users details; name,phno,email
@@ -375,23 +376,23 @@ async function placeOrderList(data, email, coupon, amount) {
   console.log(url);
   //need to change its actual problem it need to be done the payent is done
 
-  for (let product of data) {
-    console.log("Processing product:", product);
-    let handle = await placeOrder(
-      product.id,
-      product.price,
-      product.quantity,
-      email,
-      coupon,
-      randomSixDigitNumber + "",
-      {},
-      orderid
-    );
-    if (!handle) {
-      console.error("Failed to place order for product:", product);
-      return false;
-    }
-  }
+  // for (let product of data) {
+  //   console.log("Processing product:", product);
+  //   let handle = await placeOrder(
+  //     product.id,
+  //     product.price,
+  //     product.quantity,
+  //     email,
+  //     coupon,
+  //     randomSixDigitNumber + "",
+  //     {},
+  //     orderid
+  //   );
+  //   if (!handle) {
+  //     console.error("Failed to place order for product:", product);
+  //     return false;
+  //   }
+  // }
 
   return url;
 }
