@@ -16,7 +16,7 @@ const DEFAULT_BASE_URL = "https://eazypay.icicibank.com/EazyPG?";
 function getPaymentUrl(
   amount,
   referenceNo,
-  // optionalField = "",
+  optionalField,
   orderid,
   phno,
   name,
@@ -31,7 +31,7 @@ function getPaymentUrl(
     email
   );
   // const optionalFieldValue = getOptionalField(optionalField);
-  const optionalFieldValue = getOptionalField("");
+  const optionalFieldValue = getOptionalField(optionalField);
   const encryptedAmount = getAmount(amount);
   const encryptedReferenceNo = getReferenceNo(referenceNo);
 
@@ -54,10 +54,9 @@ function generatePaymentUrl(
     `&mandatory fields=${mandatoryField}` +
     `&optional fields=${optionalField}` +
     `&returnurl=${getReturnUrl()}` +
-    `&Reference No=${referenceNo}` + //
+    `&Reference No=${referenceNo}` +
     `&submerchantid=${getSubMerchantId()}` +
-    // `&transaction amount=${amount}` +
-    `&transaction amount=1` +
+    `&transaction amount=${amount}` +
     `&paymode=${getPaymode()}`;
   // reference nodemon,trnction,paymnet mode ,date and time,
   // console.log(encryptedUrl);
@@ -67,12 +66,12 @@ function generatePaymentUrl(
 
 function getMandatoryField(amount, referenceNo, orderid, phno, name, email) {
   //here 1 ois amount change it after words
-  console.log(typeof name);
-  console.log(typeof phno);
-  console.log(typeof orderid);
+  // console.log(typeof name);
+  // console.log(typeof phno);
+  // console.log(typeof orderid);
   
   return getEncryptValue(
-    `${referenceNo}|${subMerchantId}|1|${name}|${phno}|${email}|${orderid}`
+    `${referenceNo}|${subMerchantId}|${amount}|${name}|${phno}|${email}|${orderid}`
   );
 }
 

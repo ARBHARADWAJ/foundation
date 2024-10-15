@@ -368,6 +368,7 @@ async function placeOrderList(data, email, coupon, amount) {
   let url = getPaymentUrl(
     amount,
     randomSixDigitNumber,
+    "",
     orderid,
     phno,
     name,
