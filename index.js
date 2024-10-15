@@ -536,15 +536,10 @@ app.post("/payment-response", async (req, res) => {
     ...req.cookies, // Get data from cookies (equivalent to $_COOKIE)
   };
 
-  // Print all request data
-  // console.log("Request Data: ", allRequestData);
   const response = await modifyOrderPaymentResponse(allRequestData); //we can use it for the payment or request id updation
-  const resultss = allRequestData.ResponseCode.trim();
-  // console.log(response);
+  const resultss = allRequestData.ResponseCode;
+  console.log(resultss);
 
-  if (resultss === "E000") {
-    console.log("well donw in ayment");
-  }
   res.redirect("https://farm2kitchen.co.in/successpage");
 });
 
