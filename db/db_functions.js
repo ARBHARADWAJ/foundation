@@ -416,14 +416,14 @@ async function modifyOrderPaymentResponse(responsedata) {
     ]);
 
     if (updateResult.rows.length > 0) {
-      const { email } = updateResult.rows[0];
+      const { user_email } = updateResult.rows[0];
       console.log("Payment update result:", updateResult);
-      await updateJsonArray(email, [], (err, res) => {
+      await updateJsonArray(user_email, [], (err, res) => {
         if (err) {
           console.log("Error updating JSON array:", err.message);
         }
       });
-      console.log("JSON array updated for email:", email);
+      console.log("JSON array updated for email:", user_email);
       return true;
     } else {
       console.log("No email found for the given reference number.");
