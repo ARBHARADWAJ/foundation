@@ -56,7 +56,8 @@ function generatePaymentUrl(
     `&returnurl=${getReturnUrl()}` +
     `&Reference No=${referenceNo}` + //
     `&submerchantid=${getSubMerchantId()}` +
-    `&transaction amount=${amount}` +
+    // `&transaction amount=${amount}` +
+    `&transaction amount=1` +
     `&paymode=${getPaymode()}`;
   // reference nodemon,trnction,paymnet mode ,date and time,
   // console.log(encryptedUrl);
