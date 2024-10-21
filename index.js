@@ -500,13 +500,13 @@ app.post("/getOrdersByReferral", async (req, res) => {
   try {
     const response = await getOrdersByReferral(referralName);
     if (response.length > 0) {
-      // ..
+      
       res
         .status(200)
-        .json({ message: "Orders found", value: true, data: response });
+        .json({ message: "Commissions found", value: true, data: response });
     } else {
       res.status(404).json({
-        message: "No orders found with this referral name",
+        message: "No Commissions found with this referral name",
         value: false,
       });
     }
@@ -727,6 +727,9 @@ app.post("/updateUserDetails", async (req, res) => {
 });
 
 // app.post("/")
+// app.get("/getResellersCommission",async (req,res)=>{
+//   const {}
+// })
 
 // Start the server
 app.listen(port, async () => {

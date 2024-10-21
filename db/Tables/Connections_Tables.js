@@ -112,6 +112,34 @@ pool.query(createCouponQuery, (err, results) => {
   // console.log(results);
   console.log("coupon table created successfully.");
 });
+
+const createCommission = `
+    CREATE TABLE IF NOT EXISTS commission (
+    id SERIAL PRIMARY KEY,
+    orderid int,
+    purchase_amount DECIMAL(10, 2) NOT NULL,
+    reseller_name varchar(30),
+    customer_name varchar(30),
+    commission_credited_amount DECIMAL(10, 2),
+    commission_granted boolean default false,
+    date_of_purchase TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    date_of_credit TIMESTAMP,
+    link varchar default null,
+    status varchar default ''
+    );  
+    `;
+
+// commission_granted DECIMAL(10, 2),
+// balance decimal(10,2),
+pool.query(createCommission, (err, results) => {
+  if (err) {
+    console.error("Error creating table:", err);
+    return;
+  }
+  // console.log(results);
+  console.log("Commission table created successfully.");
+});
+
 const createReferalQuery = `
     CREATE TABLE IF NOT EXISTS referral (
       id SERIAL PRIMARY KEY,

@@ -401,12 +401,12 @@ async function modifyOrderPaymentResponse(responsedata) {
   try {
     let ReferenceNo = responsedata.ReferenceNo.trim();
     console.log(ReferenceNo);
-
+    const amount = responsedata["Total Amount"];
     const updateQuery = `
       UPDATE orders
       SET response = $2,status='initialized'
       WHERE reference_no = $1
-      RETURNING user_email;
+      RETURNING user_email,ordersid;
     `;
     const updateResult = await pool.query(updateQuery, [
       ReferenceNo,
@@ -414,8 +414,12 @@ async function modifyOrderPaymentResponse(responsedata) {
     ]);
 
     if (updateResult.rows.length > 0) {
-      const { user_email } = updateResult.rows[0];
+      //email,reseller,ordersid,amount
+
+      const { user_email, ordersid } = updateResult.rows[0];
       console.log("Payment update result:", updateResult);
+      const { name, referral } = await getUserByEmail(user_email);
+      const result = await insertCommission(ordersid, referral, name, amount);
       await updateJsonArray(user_email, [], (err, res) => {
         if (err) {
           console.log("Error updating JSON array:", err.message);
@@ -429,6 +433,33 @@ async function modifyOrderPaymentResponse(responsedata) {
     }
   } catch (error) {
     console.log("Error in modifyOrderPaymentResponse:", error.message);
+    return false;
+  }
+}
+// Insert function to add a new record into the commission table
+async function insertCommission(
+  orderid,
+  resellerName,
+  customerName,
+  purchaseAmount
+) {
+  const insertQuery = `
+    INSERT INTO commission (orderid, reseller_name, customer_name,purchase_amount, status,date_of_purchase)
+    VALUES ($1, $2, $3,$4,$5, CURRENT_TIMESTAMP)
+    RETURNING id;
+  `;
+  try {
+    const { rows } = await pool.query(insertQuery, [
+      orderid,
+      resellerName,
+      customerName,
+      purchaseAmount,
+      "inprocess",
+    ]);
+    console.log(`Commission entry created with ID: ${rows[0].id}`);
+    return true;
+  } catch (error) {
+    console.error("Error inserting commission:", error);
     return false;
   }
 }
@@ -733,18 +764,31 @@ async function getUsersByReferral(referralName) {
 async function getOrdersByReferral(referralName) {
   try {
     const query = `
-      SELECT  o.price, u.name, o.created_at
-      FROM orders o
-      JOIN users u ON o.user_email = u.email
-      WHERE u.referral = $1;
+      SELECT 
+        orderid,
+        customer_name, 
+        reseller_name, 
+        date_of_purchase, 
+        purchase_amount AS total_purchase_amount, 
+        commission_granted, 
+        commission_credited_amount, 
+        date_of_credit
+      FROM commission
+      WHERE reseller_name = $1;
     `;
-    //..
+
     const res = await pool.query(query, [referralName]);
 
-    console.log("Retrieved orders for referral name:", referralName);
+    console.log(
+      "Retrieved commission details for reseller name:",
+      referralName
+    );
     return res.rows;
   } catch (err) {
-    console.error("Error retrieving orders by referral:", err.stack);
+    console.error(
+      "Error retrieving commission details by reseller:",
+      err.stack
+    );
     return [];
   }
 }
