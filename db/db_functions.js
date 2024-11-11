@@ -524,9 +524,8 @@ async function SinglesOrdersList(email) {
   `;
 
     const res = await pool.query(query, [email]);
-    console.log("Retrieved orders:");
+    console.log("Retrieved orders:",res.rows);
     const orders = res.rows.map((order) => {
-      console.log(order)
       return {
         ...order,
         image: order.image.toString("base64"),
