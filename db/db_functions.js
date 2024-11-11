@@ -331,12 +331,13 @@ async function submitDetails(orderdetails, email) {
 
     const values = [name, email, phno, address, orderdetails];
 
-    pool.query(query, values, (err, res) => {
+    pool.query(query, values, async (err, res) => {
       if (err) {
         console.error("Error inserting record:", err);
         return;
       }
       console.log("Record inserted successfully.");
+      await updateJsonArray(email, []);
     });
   } catch (e) {
     console.log(e.message);
@@ -1104,5 +1105,5 @@ module.exports = {
   toogleshowhide,
   updateUserProfile,
   updateCommission,
-  submitDetails
+  submitDetails,
 };
