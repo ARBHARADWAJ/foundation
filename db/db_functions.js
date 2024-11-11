@@ -513,6 +513,8 @@ async function OrdersList() {
   }
 }
 async function SinglesOrdersList(email) {
+  console.log("just see it",email);
+  
   try {
     const query = `
     SELECT o.id, o.ordersid, o.product_id, p.name AS product_name, o.user_email, 
