@@ -163,9 +163,9 @@ pool.query(createReferalQuery, (err, results) => {
 
 const createsubitdetailsQuery = `
     CREATE TABLE IF NOT EXISTS sb (
-      id SERIAL PRIMARY KEY,
+      id SERIAL PRIMARY KEY ,
       name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL UNIQUE,
+      email VARCHAR(255) NOT NULL ,
       phno VARCHAR(15),
       address VARCHAR(255),
       orderdetails JSON[],
