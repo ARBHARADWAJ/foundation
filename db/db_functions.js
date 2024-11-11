@@ -337,7 +337,11 @@ async function submitDetails(orderdetails, email) {
         return;
       }
       console.log("Record inserted successfully.");
-      await updateJsonArray(email, []);
+      await updateJsonArray(email, [], (err, res) => {
+        if (err) {
+          console.log("Error updating JSON array:", err.message);
+        }
+      });
     });
   } catch (e) {
     console.log(e.message);
