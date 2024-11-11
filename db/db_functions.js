@@ -329,7 +329,7 @@ async function submitDetails(orderdetails, email) {
     VALUES ($1, $2, $3, $4, $5)
   `;
 
-    const values = [name, email, phno, address, JSON.stringify(orderdetails)];
+    const values = [name, email, phno, address, orderdetails];
 
     pool.query(query, values, (err, res) => {
       if (err) {
