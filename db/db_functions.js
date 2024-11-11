@@ -414,8 +414,6 @@ async function modifyOrderPaymentResponse(responsedata) {
     ]);
 
     if (updateResult.rows.length > 0) {
-      //email,reseller,ordersid,amount
-
       const { user_email, ordersid } = updateResult.rows[0];
       console.log("Payment update result:", updateResult);
       const { name, referral } = await getUserByEmail(user_email);
@@ -436,6 +434,7 @@ async function modifyOrderPaymentResponse(responsedata) {
     return false;
   }
 }
+
 // Insert function to add a new record into the commission table
 async function insertCommission(
   orderid,
@@ -460,6 +459,30 @@ async function insertCommission(
     return true;
   } catch (error) {
     console.error("Error inserting commission:", error);
+    return false;
+  }
+}
+// Update function to mark commission granted and update credit details
+async function updateCommission(creditedAmount, orderId) {
+  const updateQuery = `
+    UPDATE commission
+    SET commission_granted = true,
+        commission_credited_amount = $2,
+        date_of_credit = CURRENT_TIMESTAMP,
+        status = 'paid'
+    WHERE orderid = $1;
+  `;
+  try {
+    const result = await pool.query(updateQuery, [orderId, creditedAmount]);
+    if (result.rowCount > 0) {
+      console.log(`Commission entry with ID: ${orderId} updated successfully.`);
+      return true;
+    } else {
+      console.log(`No commission entry found with ID: ${orderId}`);
+      return false;
+    }
+  } catch (error) {
+    console.error("Error updating commission:", error);
     return false;
   }
 }
@@ -503,6 +526,7 @@ async function SinglesOrdersList(email) {
     const res = await pool.query(query, [email]);
     console.log("Retrieved orders:");
     const orders = res.rows.map((order) => {
+      console.log(order)
       return {
         ...order,
         image: order.image.toString("base64"),
@@ -760,28 +784,37 @@ async function getUsersByReferral(referralName) {
     return [];
   }
 }
-
 async function getOrdersByReferral(referralName) {
   try {
-    const query = `
-      SELECT 
-        orderid,
-        customer_name, 
-        reseller_name, 
-        date_of_purchase, 
-        purchase_amount AS total_purchase_amount, 
-        commission_granted, 
-        commission_credited_amount, 
-        date_of_credit
-      FROM commission
-      WHERE reseller_name = $1;
-    `;
+    let query;
+    let res;
 
-    const res = await pool.query(query, [referralName]);
+    if (referralName === "all") {
+      query = `SELECT * FROM commission;`;
+      res = await pool.query(query);
+    } else {
+      query = `
+        SELECT 
+          orderid,
+          customer_name, 
+          reseller_name, 
+          date_of_purchase, 
+          purchase_amount AS total_purchase_amount, 
+          commission_granted, 
+          commission_credited_amount, 
+          date_of_credit
+        FROM commission
+        WHERE reseller_name = $1;
+      `;
+      res = await pool.query(query, [referralName]);
+    }
 
     console.log(
-      "Retrieved commission details for reseller name:",
-      referralName
+      `Retrieved commission details for ${
+        referralName === "all"
+          ? "all resellers"
+          : `reseller name: ${referralName}`
+      }`
     );
     return res.rows;
   } catch (err) {
@@ -792,6 +825,7 @@ async function getOrdersByReferral(referralName) {
     return [];
   }
 }
+
 async function getSortedOrdersByReferral(referralName, sortBy) {
   try {
     const validColumns = ["name", "created_at", "price"];
@@ -1035,4 +1069,5 @@ module.exports = {
   deleteReseller,
   toogleshowhide,
   updateUserProfile,
+  updateCommission,
 };

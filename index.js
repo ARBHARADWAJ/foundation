@@ -37,6 +37,7 @@ const {
   deleteReseller,
   toogleshowhide,
   updateUserProfile,
+  updateCommission,
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -493,30 +494,7 @@ app.post("/getUsersByReferral", async (req, res) => {
   }
 });
 
-app.post("/getOrdersByReferral", async (req, res) => {
-  console.log("Fetching orders by referral name...");
-  const { referralName } = req.body;
 
-  try {
-    const response = await getOrdersByReferral(referralName);
-    if (response.length > 0) {
-      
-      res
-        .status(200)
-        .json({ message: "Commissions found", value: true, data: response });
-    } else {
-      res.status(404).json({
-        message: "No Commissions found with this referral name",
-        value: false,
-      });
-    }
-  } catch (e) {
-    res
-      .status(500)
-      .json({ message: "There was a problem retrieving orders", value: false });
-    console.error(e.message);
-  }
-});
 app.post("/getSortedOrdersByReferral", async (req, res) => {
   const { referralName, sortBy } = req.body;
 
@@ -540,13 +518,11 @@ app.post("/payment-response", async (req, res) => {
   // console.log(resultss);
   if (allRequestData["Response Code"] === "E000") {
     const response = await modifyOrderPaymentResponse(allRequestData); //we can use it for the payment or request id updation
-    
+
     res.redirect("https://farm2kitchen.co.in/successpage");
-  }
-  else{
+  } else {
     console.log(allRequestData["Response Code"]);
     res.redirect("https://farm2kitchen.co.in/errorpage");
-    
   }
 });
 
@@ -678,6 +654,56 @@ app.post("/deleteReseller", async (req, res) => {
       .json({ message: "record is not deleted successful", value: false });
   }
 });
+//get resllers orders
+app.post("/getOrdersByReferral", async (req, res) => {
+  console.log("Fetching orders by referral name...");
+  const { referralName } = req.body;
+
+  try {
+    const response = await getOrdersByReferral(referralName);
+    if (response.length > 0) {
+      res
+        .status(200)
+        .json({ message: "Commissions found", value: true, data: response });
+    } else {
+      res.status(404).json({
+        message: "No Commissions found with this referral name",
+        value: false,
+      });
+    }
+  } catch (e) {
+    res
+      .status(500)
+      .json({ message: "There was a problem retrieving orders", value: false });
+    console.error(e.message);
+  }
+});
+app.post("/updateResellersCommission", async (req, res) => {
+  const { commission_credited_amount, orderId } = req.body;
+  try {
+    const response = await updateCommission(
+      commission_credited_amount,
+      orderId
+    );
+    if (response) {
+      res.status(200).json({
+        message: "successfully updated",
+        value: true,
+      });
+    } else {
+      res
+        .status(500)
+        .json({ message: "record is not updated successful", value: false });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "record is not updated successful", value: false });
+
+    console.log(error.message);
+  }
+});
+
 app.post("/updatevisibility", async (req, res) => {
   const { name, type, value } = req.body;
   try {
@@ -692,6 +718,7 @@ app.post("/updatevisibility", async (req, res) => {
     res.status(500).json({ value: false });
   }
 });
+
 app.post("/updateUserDetails", async (req, res) => {
   const {
     email,
