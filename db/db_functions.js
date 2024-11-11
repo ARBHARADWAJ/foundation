@@ -215,12 +215,22 @@ const updateJsonArray = async (email, updatedJsonArray, callback) => {
 };
 
 const insertCart = async (id, name, price, quantity, email) => {
-  const newItem = {
-    id: id,
-    name: name,
-    quantity: parseFloat(quantity),
-    price: parseInt(price, 10),
-  };
+  let newItem;
+  if (price > 0) {
+    newItem = {
+      id: id,
+      name: name,
+      quantity: parseFloat(quantity),
+      price: parseInt(price, 10),
+    };
+  } else {
+    newItem = {
+      id: id,
+      name: name,
+      quantity: parseFloat(quantity),
+      email: email,
+    };
+  }
 
   getJsonArray(email, (err, jsonArray) => {
     if (err) {
@@ -311,6 +321,28 @@ async function removeCartItem(email, name, quantity, id) {
   }
 }
 
+async function submitDetails(orderdetails, email) {
+  try {
+    const { name, phno, address } = await getUserByEmail(email);
+    const query = `
+    INSERT INTO sb (name, email, phno, address, orderdetails)
+    VALUES ($1, $2, $3, $4, $5)
+  `;
+
+    const values = [name, email, phno, address, JSON.stringify(orderdetails)];
+
+    pool.query(query, values, (err, res) => {
+      if (err) {
+        console.error("Error inserting record:", err);
+        return;
+      }
+      console.log("Record inserted successfully.");
+    });
+  } catch (e) {
+    console.log(e.message);
+  }
+}
+
 async function placeOrder(
   product_id,
   price,
@@ -347,6 +379,7 @@ async function placeOrder(
     return false;
   }
 }
+
 function generateRandomFiveDigitNumber() {
   return Math.floor(10000 + Math.random() * 90000);
 }
@@ -513,8 +546,8 @@ async function OrdersList() {
   }
 }
 async function SinglesOrdersList(email) {
-  console.log("just see it",email);
-  
+  console.log("just see it", email);
+
   try {
     const query = `
     SELECT o.id, o.ordersid, o.product_id, p.name AS product_name, o.user_email, 
@@ -526,7 +559,7 @@ async function SinglesOrdersList(email) {
   `;
 
     const res = await pool.query(query, [email]);
-    console.log("Retrieved orders:",res.rows);
+    console.log("Retrieved orders:", res.rows);
     const orders = res.rows.map((order) => {
       return {
         ...order,
@@ -1071,4 +1104,5 @@ module.exports = {
   toogleshowhide,
   updateUserProfile,
   updateCommission,
+  submitDetails
 };

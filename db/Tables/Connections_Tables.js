@@ -161,13 +161,29 @@ pool.query(createReferalQuery, (err, results) => {
   console.log("Referral table created successfully.");
 });
 
+const createsubitdetailsQuery = `
+    CREATE TABLE IF NOT EXISTS sb (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL UNIQUE,
+      phno VARCHAR(15),
+      address VARCHAR(255),
+      orderdetails JSON[],
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+`;
+
+pool.query(createsubitdetailsQuery, (err, results) => {
+  if (err) {
+    console.error("Error creating table:", err);
+    return;
+  }
+  console.log("Table created successfully.");
+});
+
 async function createTableIfNotExists() {
   try {
-    // const client = await pool.connect();
-
     try {
-      // Check if the table exists
-
       await pool.query(`
               CREATE TABLE IF NOT EXISTS  products (
               id SERIAL PRIMARY KEY,

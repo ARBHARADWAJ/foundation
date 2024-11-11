@@ -38,6 +38,7 @@ const {
   toogleshowhide,
   updateUserProfile,
   updateCommission,
+  submitDetails
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -61,12 +62,12 @@ app.get("/", (req, res) => {
 });
 
 app.post("/registers", async (req, res) => {
-  const { name, email, password, phno, referral, address } = req.body;
+  const { name, email, password, phno, referral, address, role } = req.body;
   console.log(req.body);
-  const role = "user";
+  let role2 = role !== "" ? role : "user";
   try {
-    console.log(name, email, password, phno, referral, address, role);
-    await createUser(name, email, password, phno, referral, address, role);
+    console.log(name, email, password, phno, referral, address, role2);
+    await createUser(name, email, password, phno, referral, address, role2);
 
     res.status(200).json({
       message: "User registered",
@@ -122,6 +123,29 @@ app.post("/cart", async (req, res) => {
     console.log(e);
   }
 });
+app.post("/wholesaleAddCart", async (req, res) => {
+  const { id, name, quantity, email } = req.body;
+  try {
+    await insertCart(id, name, 0,quantity, email);
+    res.status(200).json({ message: "cart inserted", value: true });
+  } catch (e) {
+    res.status(500).json({ message: "An error occurred.", error: e.message });
+    console.log(e);
+  }
+});
+
+app.post("/submitDetails", async (req, res) => {
+  const { data, email } = req.body;
+  try {
+await submitDetails(data,email);
+    res.status(200).json({ message: "cart inserted", value: true });
+  } catch (e) {
+    res.status(500).json({ message: "An error occurred.", error: e.message });
+    console.log(e);
+  }
+});
+
+
 
 app.post("/cartlist", async (req, res) => {
   console.log("cartlist");
@@ -493,7 +517,6 @@ app.post("/getUsersByReferral", async (req, res) => {
     console.error(e.message);
   }
 });
-
 
 app.post("/getSortedOrdersByReferral", async (req, res) => {
   const { referralName, sortBy } = req.body;
