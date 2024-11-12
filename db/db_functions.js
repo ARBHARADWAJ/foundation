@@ -1089,7 +1089,7 @@ async function submittedOrders(email) {
 async function submittedOrders2() {
   try {
     const query = "select * from sb";
-    const res = await pool.query(query, [email]);
+    const res = await pool.query(query);
     if (res.rows.length === 0) {
       return [];
     } else {
