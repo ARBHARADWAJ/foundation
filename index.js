@@ -38,7 +38,8 @@ const {
   toogleshowhide,
   updateUserProfile,
   updateCommission,
-  submitDetails
+  submitDetails,
+  submittedOrders
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -776,7 +777,22 @@ app.post("/updateUserDetails", async (req, res) => {
   }
 });
 
-// app.post("/")
+app.post("/submittedOrders",async (req,res)=>{
+  const {email}=req.body;
+  console.log("Fetching orders of wholesale",email);
+
+  try {
+    const response = await submittedOrders(email);
+    if (response.length>0) {
+      res.status(200).json({ value: true,data:response });
+    } else {
+      res.status(500).json({ value: false });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ value: false });
+  }
+})
 // app.get("/getResellersCommission",async (req,res)=>{
 //   const {}
 // })

@@ -1073,6 +1073,20 @@ async function updateUserProfile(
     return false;
   }
 }
+async function submittedOrders(email){
+try {
+  const query="select * from sb where email=$1";
+  const res=await pool.query(query,[email]);
+  if(res.rows.length===0){
+    return [];
+  }
+  else{
+    return res.rows;
+  }
+} catch (error) {
+  return [];
+}
+}
 
 module.exports = {
   getCart,
@@ -1110,4 +1124,5 @@ module.exports = {
   updateUserProfile,
   updateCommission,
   submitDetails,
+  submittedOrders
 };
