@@ -39,7 +39,9 @@ const {
   updateUserProfile,
   updateCommission,
   submitDetails,
-  submittedOrders
+  submittedOrders,
+  submittedOrders2,
+  updateSubmittedOrders,
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -127,7 +129,7 @@ app.post("/cart", async (req, res) => {
 app.post("/wholesaleAddCart", async (req, res) => {
   const { id, name, quantity, email } = req.body;
   try {
-    await insertCart(id, name, 0,quantity, email);
+    await insertCart(id, name, 0, quantity, email);
     res.status(200).json({ message: "cart inserted", value: true });
   } catch (e) {
     res.status(500).json({ message: "An error occurred.", error: e.message });
@@ -138,15 +140,13 @@ app.post("/wholesaleAddCart", async (req, res) => {
 app.post("/submitDetails", async (req, res) => {
   const { data, email } = req.body;
   try {
-await submitDetails(data,email);
+    await submitDetails(data, email);
     res.status(200).json({ message: "cart inserted", value: true });
   } catch (e) {
     res.status(500).json({ message: "An error occurred.", error: e.message });
     console.log(e);
   }
 });
-
-
 
 app.post("/cartlist", async (req, res) => {
   console.log("cartlist");
@@ -777,14 +777,14 @@ app.post("/updateUserDetails", async (req, res) => {
   }
 });
 
-app.post("/submittedOrders",async (req,res)=>{
-  const {email}=req.body;
-  console.log("Fetching orders of wholesale",email);
+app.post("/submittedOrders", async (req, res) => {
+  const { email } = req.body;
+  console.log("Fetching orders of wholesale", email);
 
   try {
     const response = await submittedOrders(email);
-    if (response.length>0) {
-      res.status(200).json({ value: true,data:response });
+    if (response.length > 0) {
+      res.status(200).json({ value: true, data: response });
     } else {
       res.status(500).json({ value: false });
     }
@@ -792,7 +792,34 @@ app.post("/submittedOrders",async (req,res)=>{
     console.log(error.message);
     res.status(500).json({ value: false });
   }
-})
+});
+app.get("/submittedOrders2", async (req, res) => {
+  try {
+    const response = await submittedOrders2();
+    if (response.length > 0) {
+      res.status(200).json({ value: true, data: response });
+    } else {
+      res.status(500).json({ value: false });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ value: false });
+  }
+});
+app.post("/updateSubmittedOrders", async (req, res) => {
+  const { status, id } = req.body;
+  try {
+    const response = await updateSubmittedOrders(status, id);
+    if (response) {
+      res.status(200).json({ value: true });
+    } else {
+      res.status(500).json({ value: false });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ value: false });
+  }
+});
 // app.get("/getResellersCommission",async (req,res)=>{
 //   const {}
 // })

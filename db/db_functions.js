@@ -1073,19 +1073,41 @@ async function updateUserProfile(
     return false;
   }
 }
-async function submittedOrders(email){
-try {
-  const query="select * from sb where email=$1";
-  const res=await pool.query(query,[email]);
-  if(res.rows.length===0){
+async function submittedOrders(email) {
+  try {
+    const query = "select * from sb where email=$1";
+    const res = await pool.query(query, [email]);
+    if (res.rows.length === 0) {
+      return [];
+    } else {
+      return res.rows;
+    }
+  } catch (error) {
     return [];
   }
-  else{
-    return res.rows;
-  }
-} catch (error) {
-  return [];
 }
+async function submittedOrders2() {
+  try {
+    const query = "select * from sb";
+    const res = await pool.query(query, [email]);
+    if (res.rows.length === 0) {
+      return [];
+    } else {
+      return res.rows;
+    }
+  } catch (error) {
+    return [];
+  }
+}
+
+async function updateSubmittedOrders(status, id) {
+  try {
+    const query = "update sb set status = $1 where id=$2 ";
+    const res = await pool.query(query, [status, id]);
+    return res.rowCount > 0 ? true : false;
+  } catch (error) {
+    return [];
+  }
 }
 
 module.exports = {
@@ -1124,5 +1146,7 @@ module.exports = {
   updateUserProfile,
   updateCommission,
   submitDetails,
-  submittedOrders
+  submittedOrders,
+  submittedOrders2,
+  updateSubmittedOrders,
 };

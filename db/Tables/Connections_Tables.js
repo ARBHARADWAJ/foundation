@@ -169,7 +169,8 @@ const createsubitdetailsQuery = `
       phno VARCHAR(15),
       address VARCHAR(255),
       orderdetails JSON[],
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      status varchar(30) default 'Received',
     );
 `;
 
