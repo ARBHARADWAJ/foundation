@@ -799,11 +799,11 @@ app.get("/submittedOrders2", async (req, res) => {
     if (response.length > 0) {
       res.status(200).json({ value: true, data: response });
     } else {
-      res.status(500).json({ value: false });
+      res.status(200).json({ value: false });
     }
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ value: false });
+    res.status(200).json({ value: false });
   }
 });
 app.post("/updateSubmittedOrders", async (req, res) => {
