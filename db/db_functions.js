@@ -325,11 +325,11 @@ async function submitDetails(orderdetails, email) {
   try {
     const { name, phno, address } = await getUserByEmail(email);
     const query = `
-    INSERT INTO sb (name, email, phno, address, orderdetails)
-    VALUES ($1, $2, $3, $4, $5)
+    INSERT INTO sb (name, email, phno, address, orderdetails,status)
+    VALUES ($1, $2, $3, $4, $5,$6)
   `;
 
-    const values = [name, email, phno, address, orderdetails];
+    const values = [name, email, phno, address, orderdetails,'Received'];
 
     pool.query(query, values, async (err, res) => {
       if (err) {
