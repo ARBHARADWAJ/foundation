@@ -874,7 +874,7 @@ async function updateOrdersOfResellers(
   const query =
     "update commission set commission_granted=$1 , commission_credited_amount=$2 where orderid=$3";
   try {
-    const res = pool.query(query, [
+    const res = await  pool.query(query, [
       commission_granted,
       commission_credited_amount,
       orderid,
