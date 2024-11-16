@@ -8,7 +8,6 @@ const encryptionKey = "3869683050905603";
 const subMerchantId = "25";
 //25
 const paymode = "9";
-//9
 
 const returnUrl = "https://api.farm2kitchen.co.in/payment-response";
 const DEFAULT_BASE_URL = "https://eazypay.icicibank.com/EazyPG?";

@@ -329,7 +329,7 @@ async function submitDetails(orderdetails, email) {
     VALUES ($1, $2, $3, $4, $5,$6)
   `;
 
-    const values = [name, email, phno, address, orderdetails,'Received'];
+    const values = [name, email, phno, address, orderdetails, "Received"];
 
     pool.query(query, values, async (err, res) => {
       if (err) {
@@ -403,7 +403,8 @@ async function placeOrderList(data, email, coupon, amount) {
   console.log(orderid);
 
   let url = getPaymentUrl(
-    amount,
+    1,
+    //amount
     randomSixDigitNumber,
     "",
     orderid,
