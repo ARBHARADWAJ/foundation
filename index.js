@@ -67,7 +67,7 @@ app.get("/", (req, res) => {
 app.post("/registers", async (req, res) => {
   const { name, email, password, phno, referral, address, role } = req.body;
   console.log(req.body);
-  let role2 = role !== "" ? role : "user";
+  let role2 = role !== null ? role : "user";
   try {
     console.log(name, email, password, phno, referral, address, role2);
     await createUser(name, email, password, phno, referral, address, role2);
@@ -679,6 +679,8 @@ app.post("/deleteReseller", async (req, res) => {
   }
 });
 //get resllers orders
+//600
+
 app.post("/getOrdersByReferral", async (req, res) => {
   console.log("Fetching orders by referral name...");
   const { referralName } = req.body;
