@@ -42,6 +42,7 @@ const {
   submittedOrders,
   submittedOrders2,
   updateSubmittedOrders,
+  updateOrdersOfResellers
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -742,6 +743,24 @@ app.post("/updatevisibility", async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ value: false });
+  }
+});
+app.post("/updateOrdersResellers", async (req, res) => {
+  const { orderid, commission_granted, commission_credited_amount } = req.body;
+  try {
+    const response = await updateOrdersOfResellers(
+      orderid,
+      commission_granted,
+      commission_credited_amount
+    );
+    if (response) {
+      res.status(200).json({ value: true });
+    } else {
+      res.status(200).json({ value: false });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(200).json({ value: false });
   }
 });
 

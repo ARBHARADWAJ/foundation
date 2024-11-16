@@ -390,7 +390,7 @@ function generateRandomFiveDigitNumber() {
 }
 // Function to place multiple orders
 async function placeOrderList(data, email, coupon, amount) {
-  amount=1;
+  amount = 1;
   let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
   console.log("Placing order list:", data);
   //fetch the users details; name,phno,email
@@ -404,7 +404,6 @@ async function placeOrderList(data, email, coupon, amount) {
   console.log(orderid);
 
   let url = getPaymentUrl(
-    
     amount,
     randomSixDigitNumber,
     "",
@@ -865,6 +864,28 @@ async function getOrdersByReferral(referralName) {
     );
     return [];
   }
+} //referral name orders get
+
+async function updateOrdersOfResellers(
+  orderid,
+  commission_granted,
+  commission_credited_amount
+) {
+  const query =
+    "update commission set commission_granted=$1 , commission_credited_amount=$2 where orderid=$3";
+  try {
+    const res = pool.query(query, [
+      commission_granted,
+      commission_credited_amount,
+      orderid,
+    ]);
+    return res.rowCount > 0 ? true : false;
+  } catch (error) {
+    console.log(error.message);
+    return false;
+  }
+
+  // const query
 }
 
 async function getSortedOrdersByReferral(referralName, sortBy) {
@@ -893,7 +914,8 @@ async function getSortedOrdersByReferral(referralName, sortBy) {
     console.error("Error retrieving sorted orders by referral:", err.stack);
     return [];
   }
-}
+} //sort resellers orders columns
+
 async function getCategories() {
   const query1 = "select * from categories";
   const query2 = "select * from subcategories";
@@ -1151,4 +1173,5 @@ module.exports = {
   submittedOrders,
   submittedOrders2,
   updateSubmittedOrders,
+  updateOrdersOfResellers,
 };
