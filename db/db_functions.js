@@ -67,6 +67,7 @@ async function getAllProducts(type) {
     const result = type
       ? await pool.query(query, [type])
       : await pool.query(query);
+    console.log("type: ", type);
 
     // Check if any products were found
     if (result.rows.length === 0) {
