@@ -42,7 +42,7 @@ const {
   submittedOrders,
   submittedOrders2,
   updateSubmittedOrders,
-  updateOrdersOfResellers
+  updateOrdersOfResellers,
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -170,7 +170,7 @@ app.post("/cartlist", async (req, res) => {
 });
 //need wholesale-its success
 app.post("/addorder", upload.single("image"), async (req, res) => {
-  const { name, price, subprice, description, category, subcategory,type } =
+  const { name, price, subprice, description, category, subcategory, type } =
     req.body;
   const image = req.file.buffer;
   try {
@@ -181,7 +181,8 @@ app.post("/addorder", upload.single("image"), async (req, res) => {
       image,
       description,
       category,
-      subcategory,type
+      subcategory,
+      type
     );
     // console.log(response);
     if (response.rows.length > 0) {
@@ -229,7 +230,7 @@ app.get("/getAllProducts", async (req, res) => {
 
 app.get("/getAllProductsWholeSale", async (req, res) => {
   try {
-    let type="wholesale"
+    let type = "wholesale";
     const response = await getAllProducts(type);
     if (response.length > 0) {
       res.status(201).json({

@@ -147,7 +147,7 @@ async function addProduct(
         types,
       ]);
 
-      console.log("product added successfully:", result.rowCount);
+      console.log("product wholesale added successfully:", result.rowCount);
 
       // let re = await getAllProducts();
       return result;
