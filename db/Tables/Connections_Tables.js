@@ -193,7 +193,8 @@ async function createTableIfNotExists() {
               image BYTEA NOT NULL,
               description VARCHAR(255) ,
               category VARCHAR(255),
-              subcategory VARCHAR(255)
+              subcategory VARCHAR(255),
+              type varchar(20)
               );
             `);
       console.log("Table 'products' created successfully.");

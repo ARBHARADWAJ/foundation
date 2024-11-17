@@ -168,9 +168,9 @@ app.post("/cartlist", async (req, res) => {
     console.log(e);
   }
 });
-
+//need wholesale-its success
 app.post("/addorder", upload.single("image"), async (req, res) => {
-  const { name, price, subprice, description, category, subcategory } =
+  const { name, price, subprice, description, category, subcategory,type } =
     req.body;
   const image = req.file.buffer;
   try {
@@ -181,7 +181,7 @@ app.post("/addorder", upload.single("image"), async (req, res) => {
       image,
       description,
       category,
-      subcategory
+      subcategory,type
     );
     // console.log(response);
     if (response.rows.length > 0) {
@@ -203,10 +203,34 @@ app.post("/addorder", upload.single("image"), async (req, res) => {
       .json({ message: "record is not stored successful", value: false });
   }
 });
-
+//need whole sale
 app.get("/getAllProducts", async (req, res) => {
   try {
     const response = await getAllProducts();
+    if (response.length > 0) {
+      res.status(201).json({
+        message: "Object is successfully registered",
+        value: true,
+        data: response,
+      });
+    } else {
+      console.log("there is no data in the table");
+      res
+        .status(500)
+        .json({ message: "record is not stored successful", value: false });
+    }
+  } catch (e) {
+    console.log(e);
+    res
+      .status(500)
+      .json({ message: "record is not stored successful", value: false });
+  }
+});
+
+app.get("/getAllProductsWholeSale", async (req, res) => {
+  try {
+    let type="wholesale"
+    const response = await getAllProducts(type);
     if (response.length > 0) {
       res.status(201).json({
         message: "Object is successfully registered",

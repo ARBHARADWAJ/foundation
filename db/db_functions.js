@@ -59,10 +59,14 @@ async function getUser(email, password, callback) {
   }
 }
 
-async function getAllProducts() {
+async function getAllProducts(type) {
   try {
-    const query = `SELECT * FROM products`;
-    const result = await pool.query(query);
+    const query = type
+      ? `select * from products where type=$1`
+      : `SELECT * FROM products`;
+    const result = type
+      ? await pool.query(query, [type])
+      : await pool.query(query);
 
     // Check if any products were found
     if (result.rows.length === 0) {
@@ -119,16 +123,17 @@ async function addProduct(
   image,
   description,
   category,
-  subcategory
+  subcategory,
+  type
 ) {
   try {
     // const client = await pool.connect();
 
     try {
       await createTableIfNotExists();
-
+      let types = type ? type : "";
       const query =
-        "INSERT INTO products (name, price,subprice, image,description,category,subcategory) VALUES ($1, $2, $3,$4,$5,$6,$7) RETURNING *";
+        "INSERT INTO products (name, price,subprice, image,description,category,subcategory,type) VALUES ($1, $2, $3,$4,$5,$6,$7,$8) RETURNING *";
 
       const result = await pool.query(query, [
         name,
@@ -138,11 +143,12 @@ async function addProduct(
         description,
         category,
         subcategory,
+        types,
       ]);
 
       console.log("product added successfully:", result.rowCount);
 
-      let re = await getAllProducts();
+      // let re = await getAllProducts();
       return result;
     } finally {
       // client.release();
@@ -874,7 +880,7 @@ async function updateOrdersOfResellers(
   const query =
     "update commission set commission_granted=$1 , commission_credited_amount=$2 where orderid=$3";
   try {
-    const res = await  pool.query(query, [
+    const res = await pool.query(query, [
       commission_granted,
       commission_credited_amount,
       orderid,
