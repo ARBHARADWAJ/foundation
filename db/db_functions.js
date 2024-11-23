@@ -90,11 +90,18 @@ async function getAllProducts(type) {
     return [];
   }
 }
-async function getProductsByCategory(category) {
+async function getProductsByCategory(category, type) {
   try {
-    const query = `SELECT * FROM products WHERE category= $1`;
-    const result = await pool.query(query, [category]);
-
+    var query = "";
+    var result = null;
+    
+    if (type.length > 0) {
+      query = `SELECT * FROM products WHERE category= $1 and type=$2`;
+      result = await pool.query(query, [category, type]);
+    } else {
+      query = `SELECT * FROM products WHERE category= $1`;
+      result = await pool.query(query, [category]);
+    }
     // Check if any products were found
     if (result.rows.length === 0) {
       console.log("No products found in the 'products' table.");
@@ -397,7 +404,6 @@ function generateRandomFiveDigitNumber() {
 }
 // Function to place multiple orders
 async function placeOrderList(data, email, coupon, amount) {
-  
   let randomSixDigitNumber = Math.floor(100000 + Math.random() * 900000);
   console.log("Placing order list:", data);
   //fetch the users details; name,phno,email

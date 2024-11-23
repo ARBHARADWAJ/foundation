@@ -277,6 +277,33 @@ app.post("/getProductsByCategory", async (req, res) => {
       .json({ message: "record is not stored successful", value: false });
   }
 });
+//wholesale
+app.post("/getProductsByCategoryWholesale", async (req, res) => {
+  const { category } = req.body;
+  try {
+    const type="wholesale";
+    const response = await getProductsByCategory(category,type);
+    if (response.length > 0) {
+      res.status(201).json({
+        message: "the category: wholesale data has been retrived",
+        value: true,
+        data: response,
+      });
+    } else {
+      console.log("there is no data in the table");
+      res.status(200).json({
+        message: "record is not stored successful",
+        value: true,
+        data: [],
+      });
+    }
+  } catch (e) {
+    console.log(e);
+    res
+      .status(500)
+      .json({ message: "record is not stored successful", value: false });
+  }
+});
 
 app.post("/getUser", async (req, res) => {
   console.log("get users");
