@@ -95,7 +95,7 @@ async function getProductsByCategory(category, type) {
     var query = "";
     var result = null;
     
-    if (type.length > 0) {
+    if (type?.length > 0) {
       query = `SELECT * FROM products WHERE category= $1 and type=$2`;
       result = await pool.query(query, [category, type]);
     } else {
