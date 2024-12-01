@@ -63,7 +63,7 @@ async function getAllProducts(type) {
   try {
     const query = type
       ? `select * from products where type=$1`
-      : `SELECT * FROM products where type='' `;
+      : `SELECT * FROM products where type='' or type=null `;
     const result = type
       ? await pool.query(query, [type])
       : await pool.query(query);
@@ -74,7 +74,9 @@ async function getAllProducts(type) {
       console.log("No products found in the 'products' table.");
       return [];
     } else {
-      console.log("All products from 'products' are here check this out:");
+      console.log(
+        "All products from 'products' are here check this out: for get all products"
+      );
 
       const products = result.rows.map((product) => {
         return {
@@ -82,8 +84,7 @@ async function getAllProducts(type) {
           image: product.image.toString("base64"),
         };
       });
-      console.log(products);
-      
+      // console.log(products);
 
       return products;
     }
@@ -109,7 +110,10 @@ async function getProductsByCategory(category, type) {
       console.log("No products found in the 'products' table.");
       return [];
     } else {
-      console.log("All products from 'products' with the category is here");
+      console.log(
+        "All products from 'products' with the category is here where type is",
+        type
+      );
 
       const products = result.rows.map((product) => {
         return {
@@ -245,7 +249,7 @@ const insertCart = async (id, name, price, quantity, email, total, weight) => {
       name: name,
       weight: weight,
       email: email,
-      total: total
+      total: total,
     };
   } else {
     newItem = {
