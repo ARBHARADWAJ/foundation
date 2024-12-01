@@ -62,8 +62,8 @@ async function getUser(email, password, callback) {
 async function getAllProducts(type) {
   try {
     const query = type
-      ? `select * from products where type=$1`
-      : `SELECT * FROM products`;
+      ? `SELECT * FROM products WHERE type = $1`
+      : `SELECT * FROM products WHERE type != 'wholesale'`;
     const result = type
       ? await pool.query(query, [type])
       : await pool.query(query);
@@ -243,7 +243,7 @@ const insertCart = async (id, name, price, quantity, email, total, weight) => {
       name: name,
       weight: weight,
       email: email,
-      total: total
+      total: total,
     };
   } else {
     newItem = {
