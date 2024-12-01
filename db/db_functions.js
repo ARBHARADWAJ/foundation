@@ -62,13 +62,11 @@ async function getUser(email, password, callback) {
 async function getAllProducts(type) {
   try {
     const query = type
-      ? `SELECT * FROM products WHERE type = $1`
-      : `SELECT * FROM products WHERE type != 'wholesale'`;
-
+      ? `select * from products where type=$1`
+      : `SELECT * FROM products `;
     const result = type
       ? await pool.query(query, [type])
-      : await pool.query(query); // No parameters when `type` is falsy
-
+      : await pool.query(query);
     console.log("type: ", type);
 
     // Check if any products were found
@@ -81,7 +79,7 @@ async function getAllProducts(type) {
       const products = result.rows.map((product) => {
         return {
           ...product,
-          image: product.image ? product.image.toString("base64") : null, // Handle cases where `image` might be null
+          image: product.image.toString("base64"),
         };
       });
 
@@ -92,7 +90,6 @@ async function getAllProducts(type) {
     return [];
   }
 }
-
 async function getProductsByCategory(category, type) {
   try {
     var query = "";
@@ -102,7 +99,7 @@ async function getProductsByCategory(category, type) {
       query = `SELECT * FROM products WHERE category= $1 and type=$2`;
       result = await pool.query(query, [category, type]);
     } else {
-      query = `SELECT * FROM products WHERE category= $1 and type!='wholesale'`;
+      query = `SELECT * FROM products WHERE category= $1`;
       result = await pool.query(query, [category]);
     }
     // Check if any products were found
@@ -246,7 +243,7 @@ const insertCart = async (id, name, price, quantity, email, total, weight) => {
       name: name,
       weight: weight,
       email: email,
-      total: total,
+      total: total
     };
   } else {
     newItem = {
