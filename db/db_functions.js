@@ -64,9 +64,11 @@ async function getAllProducts(type) {
     const query = type
       ? `SELECT * FROM products WHERE type = $1`
       : `SELECT * FROM products WHERE type != 'wholesale'`;
+
     const result = type
       ? await pool.query(query, [type])
-      : await pool.query(query);
+      : await pool.query(query); // No parameters when `type` is falsy
+
     console.log("type: ", type);
 
     // Check if any products were found
@@ -79,7 +81,7 @@ async function getAllProducts(type) {
       const products = result.rows.map((product) => {
         return {
           ...product,
-          image: product.image.toString("base64"),
+          image: product.image ? product.image.toString("base64") : null, // Handle cases where `image` might be null
         };
       });
 
@@ -90,6 +92,7 @@ async function getAllProducts(type) {
     return [];
   }
 }
+
 async function getProductsByCategory(category, type) {
   try {
     var query = "";
@@ -99,7 +102,7 @@ async function getProductsByCategory(category, type) {
       query = `SELECT * FROM products WHERE category= $1 and type=$2`;
       result = await pool.query(query, [category, type]);
     } else {
-      query = `SELECT * FROM products WHERE category= $1`;
+      query = `SELECT * FROM products WHERE category= $1 and type!='wholesale'`;
       result = await pool.query(query, [category]);
     }
     // Check if any products were found

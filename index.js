@@ -207,7 +207,8 @@ app.post("/addorder", upload.single("image"), async (req, res) => {
 //need whole sale
 app.get("/getAllProducts", async (req, res) => {
   try {
-    const response = await getAllProducts();
+    const type='wholesale'
+    const response = await getAllProducts(type);
     if (response.length > 0) {
       res.status(201).json({
         message: "Object is successfully registered",
