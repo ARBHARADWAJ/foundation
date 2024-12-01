@@ -63,7 +63,7 @@ async function getAllProducts(type) {
   try {
     const query = type
       ? `select * from products where type=$1`
-      : `SELECT * FROM products `;
+      : `SELECT * FROM products where type="" `;
     const result = type
       ? await pool.query(query, [type])
       : await pool.query(query);
