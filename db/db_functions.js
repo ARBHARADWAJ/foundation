@@ -74,7 +74,7 @@ async function getAllProducts(type) {
       console.log("No products found in the 'products' table.");
       return [];
     } else {
-      console.log("All products from 'products':");
+      console.log("All products from 'products' are here check this out:");
 
       const products = result.rows.map((product) => {
         return {
@@ -82,6 +82,8 @@ async function getAllProducts(type) {
           image: product.image.toString("base64"),
         };
       });
+      console.log(products);
+      
 
       return products;
     }
