@@ -62,73 +62,62 @@ async function getUser(email, password, callback) {
 async function getAllProducts(type) {
   try {
     const query = type
-      ? `select * from products where type=$1`
-      : `SELECT * FROM products where type='' or type=null `;
+      ? `SELECT * FROM products WHERE type = $1`
+      : `SELECT * FROM products WHERE (type IS NULL OR type = '' OR type != 'wholesale')`;
+      
     const result = type
       ? await pool.query(query, [type])
       : await pool.query(query);
+
     console.log("type: ", type);
 
-    // Check if any products were found
     if (result.rows.length === 0) {
       console.log("No products found in the 'products' table.");
       return [];
-    } else {
-      console.log(
-        "All products from 'products' are here check this out: for get all products"
-      );
-
-      const products = result.rows.map((product) => {
-        return {
-          ...product,
-          image: product.image.toString("base64"),
-        };
-      });
-      // console.log(products);
-
-      return products;
     }
+
+    const products = result.rows.map((product) => ({
+      ...product,
+      image: product.image ? product.image.toString("base64") : null, // Handle null/undefined images
+    }));
+
+    return products;
   } catch (error) {
     console.error("Error retrieving products:", error);
     return [];
   }
 }
+
 async function getProductsByCategory(category, type) {
   try {
-    var query = "";
-    var result = null;
+    let query;
+    let result;
 
     if (type?.length > 0) {
-      query = `SELECT * FROM products WHERE category= $1 and type=$2`;
+      query = `SELECT * FROM products WHERE category = $1 AND type = $2`;
       result = await pool.query(query, [category, type]);
     } else {
-      query = `SELECT * FROM products WHERE category= $1`;
+      query = `SELECT * FROM products WHERE category = $1 AND (type IS NULL OR type = '' OR type != 'wholesale')`;
       result = await pool.query(query, [category]);
     }
-    // Check if any products were found
+
     if (result.rows.length === 0) {
       console.log("No products found in the 'products' table.");
       return [];
-    } else {
-      console.log(
-        "All products from 'products' with the category is here where type is",
-        type
-      );
-
-      const products = result.rows.map((product) => {
-        return {
-          ...product,
-          image: product.image.toString("base64"),
-        };
-      });
-
-      return products;
     }
+
+    const products = result.rows.map((product) => ({
+      ...product,
+      image: product.image ? product.image.toString("base64") : null, // Handle null/undefined images
+    }));
+
+    return products;
   } catch (error) {
     console.error("Error retrieving products:", error);
     return [];
   }
 }
+
 
 async function addProduct(
   name,
