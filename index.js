@@ -128,9 +128,9 @@ app.post("/cart", async (req, res) => {
   }
 });
 app.post("/wholesaleAddCart", async (req, res) => {
-  const { id, name, quantity, email } = req.body;
+  const { id, name, quantity, email, total, weight } = req.body;
   try {
-    await insertCart(id, name, 0, quantity, email);
+    await insertCart(id, name, 0, quantity, email, total ?? 0, weight ?? 0);
     res.status(200).json({ message: "cart inserted", value: true });
   } catch (e) {
     res.status(500).json({ message: "An error occurred.", error: e.message });
@@ -281,8 +281,8 @@ app.post("/getProductsByCategory", async (req, res) => {
 app.post("/getProductsByCategoryWholesale", async (req, res) => {
   const { category } = req.body;
   try {
-    const type="wholesale";
-    const response = await getProductsByCategory(category,type);
+    const type = "wholesale";
+    const response = await getProductsByCategory(category, type);
     if (response.length > 0) {
       res.status(201).json({
         message: "the category: wholesale data has been retrived",

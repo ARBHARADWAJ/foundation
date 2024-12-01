@@ -94,7 +94,7 @@ async function getProductsByCategory(category, type) {
   try {
     var query = "";
     var result = null;
-    
+
     if (type?.length > 0) {
       query = `SELECT * FROM products WHERE category= $1 and type=$2`;
       result = await pool.query(query, [category, type]);
@@ -228,7 +228,7 @@ const updateJsonArray = async (email, updatedJsonArray, callback) => {
   }
 };
 
-const insertCart = async (id, name, price, quantity, email) => {
+const insertCart = async (id, name, price, quantity, email, total, weight) => {
   let newItem;
   if (price > 0) {
     newItem = {
@@ -236,6 +236,14 @@ const insertCart = async (id, name, price, quantity, email) => {
       name: name,
       quantity: parseFloat(quantity),
       price: parseInt(price, 10),
+    };
+  } else if (total > 0) {
+    newItem = {
+      id: id,
+      name: name,
+      weight: weight,
+      email: email,
+      total: total
     };
   } else {
     newItem = {
