@@ -253,6 +253,8 @@ const insertCartWholeSale = async (id, name, email, cartlist) => {
     email,
     cartlist: cartlist,
   };
+  console.log("wholesale cart add :",newcartlist);
+  
   getJsonArray(email, (err, jsonArray) => {
     if (err) {
       return console.error("Error fetching JSON array:", err.message);
