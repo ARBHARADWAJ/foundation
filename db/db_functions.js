@@ -64,7 +64,7 @@ async function getAllProducts(type) {
     const query = type
       ? `SELECT * FROM products WHERE type = $1`
       : `SELECT * FROM products WHERE (type IS NULL OR type = '' OR type != 'wholesale')`;
-      
+
     const result = type
       ? await pool.query(query, [type])
       : await pool.query(query);
@@ -117,7 +117,6 @@ async function getProductsByCategory(category, type) {
     return [];
   }
 }
-
 
 async function addProduct(
   name,
@@ -223,39 +222,21 @@ const updateJsonArray = async (email, updatedJsonArray, callback) => {
   }
 };
 
-const insertCart = async (id, name, price, quantity, email, total, weight) => {
-  let newItem;
-  if (price > 0) {
-    newItem = {
+const insertCart = async (id, name, price, quantity, email) => {
+  let newItem = {
       id: id,
       name: name,
+      email:email,
       quantity: parseFloat(quantity),
       price: parseInt(price, 10),
     };
-  } else if (total > 0) {
-    newItem = {
-      id: id,
-      name: name,
-      weight: weight,
-      email: email,
-      total: total,
-    };
-  } else {
-    newItem = {
-      id: id,
-      name: name,
-      quantity: parseFloat(quantity),
-      email: email,
-    };
-  }
+  
 
   getJsonArray(email, (err, jsonArray) => {
     if (err) {
       return console.error("Error fetching JSON array:", err.message);
     }
-    // console.log(jsonArray);
     const updatedJsonArray = appendDataToJsonArray(jsonArray, newItem);
-    // console.log(updatedJsonArray);
     updateJsonArray(email, updatedJsonArray, (err, results) => {
       if (err) {
         return console.error("Error updating JSON array:", err.message);
@@ -264,6 +245,24 @@ const insertCart = async (id, name, price, quantity, email, total, weight) => {
     });
   });
 };
+
+const insertCartWholeSale = async (cartlist) => {
+ 
+  getJsonArray(email, (err, jsonArray) => {
+    if (err) {
+      return console.error("Error fetching JSON array:", err.message);
+    }
+    const updatedJsonArray = appendDataToJsonArray(jsonArray, cartlist);
+    updateJsonArray(email, updatedJsonArray, (err, results) => {
+      if (err) {
+        return console.error("Error updating JSON array:", err.message);
+      }
+      console.log("JSON array updated successfully:");
+    });
+  });
+};
+
+
 async function getpic(id) {
   const query = "SELECT image FROM products WHERE id = $1";
   try {
@@ -1190,4 +1189,5 @@ module.exports = {
   submittedOrders2,
   updateSubmittedOrders,
   updateOrdersOfResellers,
+  insertCartWholeSale
 };

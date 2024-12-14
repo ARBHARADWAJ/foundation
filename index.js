@@ -43,6 +43,7 @@ const {
   submittedOrders2,
   updateSubmittedOrders,
   updateOrdersOfResellers,
+  insertCartWholeSale
 } = require("./db/db_functions");
 const { createTableIfNotExists } = require("./db/Tables/Connections_Tables");
 const cors = require("cors");
@@ -128,12 +129,12 @@ app.post("/cart", async (req, res) => {
   }
 });
 app.post("/wholesaleAddCart", async (req, res) => {
-  const { id, name, quantity, email, total, weight } = req.body;
+  const { cartlist } = req.body;
   try {
-    await insertCart(id, name, 0, quantity, email, total ?? 0, weight ?? 0);
-    res.status(200).json({ message: "cart inserted", value: true });
+    await insertCartWholeSale(cartlist);
+    res.status(200).json({ message: "cart wholesale inserted", value: true });
   } catch (e) {
-    res.status(500).json({ message: "An error occurred.", error: e.message });
+    res.status(500).json({ message: "An error occurred. wholesale", error: e.message });
     console.log(e);
   }
 });
@@ -207,7 +208,7 @@ app.post("/addorder", upload.single("image"), async (req, res) => {
 //need whole sale
 app.get("/getAllProducts", async (req, res) => {
   try {
-    const type='wholesale'
+    const type = "wholesale";
     const response = await getAllProducts();
     if (response.length > 0) {
       res.status(201).json({
