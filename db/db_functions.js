@@ -224,13 +224,12 @@ const updateJsonArray = async (email, updatedJsonArray, callback) => {
 
 const insertCart = async (id, name, price, quantity, email) => {
   let newItem = {
-      id: id,
-      name: name,
-      email:email,
-      quantity: parseFloat(quantity),
-      price: parseInt(price, 10),
-    };
-  
+    id: id,
+    name: name,
+    email: email,
+    quantity: parseFloat(quantity),
+    price: parseInt(price, 10),
+  };
 
   getJsonArray(email, (err, jsonArray) => {
     if (err) {
@@ -246,13 +245,19 @@ const insertCart = async (id, name, price, quantity, email) => {
   });
 };
 
-const insertCartWholeSale = async (cartlist) => {
- 
+const insertCartWholeSale = async (id, name, email, cartlist) => {
+  const newcartlist = {
+    id: id,
+    name: name,
+    email,
+    email,
+    cartlist: cartlist,
+  };
   getJsonArray(email, (err, jsonArray) => {
     if (err) {
       return console.error("Error fetching JSON array:", err.message);
     }
-    const updatedJsonArray = appendDataToJsonArray(jsonArray, cartlist);
+    const updatedJsonArray = appendDataToJsonArray(jsonArray, newcartlist);
     updateJsonArray(email, updatedJsonArray, (err, results) => {
       if (err) {
         return console.error("Error updating JSON array:", err.message);
@@ -261,7 +266,6 @@ const insertCartWholeSale = async (cartlist) => {
     });
   });
 };
-
 
 async function getpic(id) {
   const query = "SELECT image FROM products WHERE id = $1";
@@ -1189,5 +1193,5 @@ module.exports = {
   submittedOrders2,
   updateSubmittedOrders,
   updateOrdersOfResellers,
-  insertCartWholeSale
+  insertCartWholeSale,
 };

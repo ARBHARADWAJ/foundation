@@ -129,9 +129,9 @@ app.post("/cart", async (req, res) => {
   }
 });
 app.post("/wholesaleAddCart", async (req, res) => {
-  const { cartlist } = req.body;
+  const { id, name,email,cartlist } = req.body;
   try {
-    await insertCartWholeSale(cartlist);
+    await insertCartWholeSale(id,name,email,cartlist);
     res.status(200).json({ message: "cart wholesale inserted", value: true });
   } catch (e) {
     res.status(500).json({ message: "An error occurred. wholesale", error: e.message });
